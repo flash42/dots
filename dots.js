@@ -165,7 +165,7 @@ var quad = new QuadTree({
     height:stage.size.h
 });
 
-var MAX_POPULATION = 1200;
+var MAX_POPULATION = 250;
 var pupulation = 0;
 
 function spawn() {
