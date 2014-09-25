@@ -1,13 +1,21 @@
 <!DOCTYPE html>
 <html>
-
   <head>
-    <meta charset="utf-8">
-      <title>JS Bin</title>
-    </head>
-    <body>
-      <canvas id="canv-1" width="500" height="500"></canvas>
-    </body>
-    <script src="QuadTree.js"></script>
-    <script src="dots.js"></script>
-  </html>
+    <meta charset="utf-8" />
+    <title>JS Bin</title>
+  </head>
+  <body>
+    <canvas id="canv-1" width="500" height="500"></canvas>
+    <p>Max population: <input data-bind='value: maxPopulation' /></p>
+    <p>Stage width: <input data-bind='value: stageWidth' /></p>
+    <p>Stage height: <input data-bind='value: stageHeight' /></p>
+    <p>Dot weight: <input data-bind='value: dotWidth' /></p>
+    <p>Dot height: <input data-bind='value: dotHeight' /></p>
+
+  </body>
+  <script src="http://knockoutjs.com/downloads/knockout-3.0.0.js"></script>
+  <script src="QuadTree.js"></script>
+  <script src="dot.js"></script>
+  <script src="stage.js"></script>
+  <script src="dots.js"></script>
+</html>

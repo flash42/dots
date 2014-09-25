@@ -1,68 +1,89 @@
+var STAGE_WIDTH = 500;
+var STAGE_HEIGHT = 500;
+
+var DOT_WIDTH = 15;
+var DOT_HEIGHT = 3;
+
+var MAX_POPULATION = 300;
+
+var DIR_DOWN = 1;
+var DIR_RIGHT = 2;
+var DIR_UP = 3;
+var DIR_LEFT = 4;
+
+ko.numericObservable = function(initialValue) {
+    var _actual = ko.observable(initialValue);
+
+    var result = ko.dependentObservable({
+        read: function() {
+            return _actual();
+        },
+        write: function(newValue) {
+            var parsedValue = parseFloat(newValue);
+            _actual(isNaN(parsedValue) ? newValue : parsedValue);
+        }
+    });
+
+    return result;
+};
+
+
+var Scene = function (max_population, stage_width, stage_height, dot_width, dot_height) {
+  this.changeHandler = function(newValue) {
+    reset();
+  }
+
+  this.maxPopulation = ko.numericObservable(max_population);
+  this.stageWidth = ko.numericObservable(stage_width);
+  this.stageHeight = ko.numericObservable(stage_height);
+  this.dotWidth = ko.numericObservable(dot_width);
+  this.dotHeight = ko.numericObservable(dot_height);
+  this.maxPopulation.subscribe(this.changeHandler);
+  this.stageWidth.subscribe(this.changeHandler);
+  this.stageHeight.subscribe(this.changeHandler);
+  this.dotWidth.subscribe(this.changeHandler);
+  this.dotHeight.subscribe(this.changeHandler);
+};
+
+var scene = new Scene(MAX_POPULATION, STAGE_WIDTH, STAGE_HEIGHT, DOT_WIDTH, DOT_HEIGHT)
+ko.applyBindings(scene);
+
+// ++++++++++++++
+// Initialization +
+// ++++++++++++++
+  
+var population = 0;
+var stage = Stage(scene.stageWidth(), scene.stageHeight());
 var canvas = document.getElementById('canv-1');
 var ctx = canvas.getContext('2d');
 var dotId = 0;
 
-var Dot = function(color, startX, startY) {
-  var dot = {};
-  var sgn = Math.round(Math.random() * 10) % 2 == 1 ? 1 : -1;
-  dot.speed = 1 + Math.round(Math.random() * 10) * 0.04 * sgn;
-  dot.id = dotId;
-  dotId++;
-  dot.width = 15;
-  dot.height = 3;
-  dot.x = startX;
-  dot.y = startY
-
-  dot.aim = color === "red" ? 485 : 1;
-  dot.move = function(toX, toY) {
-    dot.x = toX;
-    dot.y = toY;
-  };
-  dot.intersects = function(otherDot) {
-    var intersX = false;
-    var intersY = false;
-    if (dot.x < otherDot.x && otherDot.x <= dot.x + dot.width) {
-      intersX = true; 
-    }
-    if (otherDot.x < dot.x && dot.x <= otherDot.x + otherDot.width ) {
-      intersX = true; 
-    }
-    if (dot.y <= otherDot.y && otherDot.y <= dot.y + dot.height) {
-      intersY = true; 
-    }
-    if (otherDot.y <= dot.y && dot.y <= otherDot.y + otherDot.height) {
-      intersY = true;
-    }
-        
-    return intersX && intersY;
-  };  
-  dot.draw = function() {
-    ctx.beginPath();
-    ctx.rect(dot.x, dot.y, dot.width, dot.height);
-    ctx.closePath();
-  };
-  return dot;
-};
+var quad = new QuadTree({
+  x:0,
+      y:0,
+      width:stage.size.w,
+      height:stage.size.h
+      });
 
 var stepDot = function(dotToStep, dir) {
-  if (dir === 1 && dotToStep.y < 485) {
+  if (dir === DIR_DOWN && dotToStep.y < scene.stageWidth() - scene.dotWidth()) {
     dotToStep.move(dotToStep.x, dotToStep.y + dotToStep.speed);
   }
-  if (dir === 2) {
+  if (dir === DIR_RIGHT) {
     dotToStep.move(dotToStep.x + dotToStep.speed, dotToStep.y);
   }
-  if (dir === 3 && 16 < dotToStep.y) {
+  if (dir === DIR_UP && scene.dotWidth() + 1 < dotToStep.y) {
     dotToStep.move(dotToStep.x, dotToStep.y - dotToStep.speed);
   }
-  if (dir === 4) {
+  if (dir === DIR_LEFT) {
     dotToStep.move(dotToStep.x - dotToStep.speed, dotToStep.y);
   }
     
   // Move out to after-step-logic
   if (dotToStep.aim === 1 && dotToStep.x <= 1) {
-    dotToStep.aim = 485;
+    dotToStep.aim = scene.stageWidth() - scene.dotWidth();
   }
-  if (dotToStep.aim === 485 && 485 <= dotToStep.x) {
+  if (dotToStep.aim === (scene.stageWidth() - scene.dotWidth()) && (scene.stageWidth() - scene.dotWidth()) <= dotToStep.x) {
     dotToStep.aim = 1;
   }
 };
@@ -78,106 +99,22 @@ var calcDir = function(currDot, otherDots) {
     if (chck.intersects(currDot)) {
       
       var randomDirSeed = Math.random();
-      if (randomDirSeed < 0.04) currDot.aim === 485 ? currDot.aim = 1 : currDot.aim = 485;
-      if (randomDirSeed < 0.33) return 1;
-      if (randomDirSeed < 0.66) return 3;
+      if (randomDirSeed < 0.04) currDot.aim === (scene.stageWidth() - scene.dotWidth()) ? currDot.aim = 1 : currDot.aim = (scene.stageWidth() - scene.dotWidth());
+      if (randomDirSeed < 0.33) return DIR_DOWN;
+      if (randomDirSeed < 0.66) return DIR_UP;
       return 0;
     }
   }
   
-  if (currDot.x <= currDot.aim) return 2;
-  if (currDot.aim <= currDot.x) return 4;
+  if (currDot.x <= currDot.aim) return DIR_RIGHT;
+  if (currDot.aim <= currDot.x) return DIR_LEFT;
 };
-
-
-var Stage = function(w, h) {
-  var stage = {};
-  stage.size = {w: w, h: h};
-  stage.redBase = 1;
-  stage.blueBase = 485;
-  stage.redDots = [];
-  stage.blueDots = [];
-    
-  stage.step = function () {
-    var currDot;
-    var toDir;
-    var chck;
-    var steppedDot;
-    var allDots = stage.redDots.concat(stage.blueDots);
-    
-    for (i = 0; i < stage.redDots.length; i++) {
-      currDot = stage.redDots[i];
-      toDir = calcDir(currDot, allDots);
-      stepDot(currDot, toDir);
-    }
-        
-    for (i = 0; i < stage.blueDots.length; i++) {
-      currDot = stage.blueDots[i];
-      toDir = calcDir(currDot, allDots);
-      stepDot(currDot, toDir);
-    }     
-  };
-    
-  stage.fieldDraw = function() {
-    ctx.save();
-    ctx.beginPath();
-    ctx.strokeStyle = "green";
-    ctx.lineWidth = "1";
-    ctx.rect(0, 0, stage.size.w, stage. size.h);
-    ctx.stroke();
-    ctx.closePath();
-    ctx.restore();
-  };
-    
-  stage.dotsDraw = function() {
-    
-    for (i = 0; i < stage.redDots.length; i++) {
-      ctx.fillStyle = "red";
-      stage.redDots[i].draw();
-      ctx.fill();
-    }
-    for (i = 0; i < stage.blueDots.length; i++) {
-      ctx.fillStyle = "blue";
-      stage.blueDots[i].draw();
-      ctx.fill();
-    }
-  };
-    
-  stage.clear = function() {
-    ctx.save();
-    ctx.clearRect(0, 0, stage.size.w, stage.size.h);
-    ctx.fill();
-    ctx.restore(); 
-  };
-
-  stage.draw = function() {
-    stage.fieldDraw();
-    stage.dotsDraw();
-  };
-    
-  return stage;
-};
-var stage = Stage(500, 500);
-
-
-// ++++++++++++++
-// Initialization +
-// ++++++++++++++
-var quad = new QuadTree({
-    x:0,
-    y:0,
-    width:stage.size.w,
-    height:stage.size.h
-});
-
-var MAX_POPULATION = 1200;
-var pupulation = 0;
 
 function spawn() {
-  if (MAX_POPULATION <= pupulation) return;
+  if (scene.maxPopulation() <= population) return;
   if (Math.random() <= 1) {
-    pupulation++;
-    var startY = Math.round(Math.round(Math.random() * 1000) / 2) - 5;
+    population++;
+    var startY = Math.round(Math.random() * 1000) * scene.stageHeight() / 1000
     var newDot;
 
     if (Math.random() <= 0.5) {
@@ -209,6 +146,15 @@ function draw() {
   quad.clear();
   updateQuad();
   window.requestAnimationFrame(draw);
+}
+
+function reset() {
+  population = 0;
+  dotId = 0;
+  stage = Stage(scene.stageWidth(), scene.stageHeight());
+  canvas.width = stage.size.w;
+  canvas.height = stage.size.h;
+  quad = new QuadTree({x:0, y:0, width:stage.size.w, height:stage.size.h});
 }
 
 draw();
