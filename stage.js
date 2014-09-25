@@ -16,13 +16,13 @@ var Stage = function(w, h) {
     
     for (i = 0; i < stage.redDots.length; i++) {
       currDot = stage.redDots[i];
-      toDir = calcDir(currDot, allDots);
+      toDir = calcDir(currDot);
       stepDot(currDot, toDir);
     }
         
     for (i = 0; i < stage.blueDots.length; i++) {
       currDot = stage.blueDots[i];
-      toDir = calcDir(currDot, allDots);
+      toDir = calcDir(currDot);
       stepDot(currDot, toDir);
     }     
   };

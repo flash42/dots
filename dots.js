@@ -72,14 +72,14 @@ var stepDot = function(dotToStep, dir) {
   if (dir === DIR_RIGHT) {
     dotToStep.move(dotToStep.x + dotToStep.speed, dotToStep.y);
   }
-  if (dir === DIR_UP && scene.dotWidth() + 1 < dotToStep.y) {
+  if (dir === DIR_UP && scene.dotWidth() + dotToStep.speed < dotToStep.y) {
     dotToStep.move(dotToStep.x, dotToStep.y - dotToStep.speed);
   }
   if (dir === DIR_LEFT) {
     dotToStep.move(dotToStep.x - dotToStep.speed, dotToStep.y);
   }
     
-  // Move out to after-step-logic
+  // TODO Wall hit event-handler
   if (dotToStep.aim === 1 && dotToStep.x <= 1) {
     dotToStep.aim = scene.stageWidth() - scene.dotWidth();
   }
@@ -88,45 +88,100 @@ var stepDot = function(dotToStep, dir) {
   }
 };
 
-var calcDir = function(currDot, otherDots) {
+var calcDir = function(currDot) {
   var chck;
   var toDir = 0;
 
+  // TODO fix and use QuadTree - overlapping can happen
   var candidateDots = quad.retrieve(currDot);
+  //var candidateDots = stage.blueDots.concat(stage.redDots);
+  var canStep = true;
+  var deltaX = currDot.x <= currDot.aim ? currDot.speed : -currDot.speed;
+  
   for (j = 0; j < candidateDots.length; j++) {
     chck = candidateDots[j];
-        
-    if (chck.intersects(currDot)) {
-      
-      var randomDirSeed = Math.random();
-      if (randomDirSeed < 0.04) currDot.aim === (scene.stageWidth() - scene.dotWidth()) ? currDot.aim = 1 : currDot.aim = (scene.stageWidth() - scene.dotWidth());
-      if (randomDirSeed < 0.33) return DIR_DOWN;
-      if (randomDirSeed < 0.66) return DIR_UP;
-      return 0;
+
+    if (chck.intersects({id: currDot.id, x: currDot.x + deltaX, y: currDot.y, width: currDot.width, height: currDot.height})) {
+      canStep = false;
     }
   }
   
-  if (currDot.x <= currDot.aim) return DIR_RIGHT;
-  if (currDot.aim <= currDot.x) return DIR_LEFT;
+  if (canStep) {
+    currDot.stalled = 0;
+    if (currDot.x <= currDot.aim) return DIR_RIGHT;
+    if (currDot.aim <= currDot.x) return DIR_LEFT;
+  } else {
+    var randomDirSeed = Math.random();
+    var deltaY = 0;
+    var dir;
+    deltaX = 0;
+    if (randomDirSeed < 0.04) {
+      if (currDot.x <= currDot.aim) {
+        deltaX = -currDot.speed;
+        dir = DIR_LEFT;
+      }
+      else {
+        deltaX = currDot.speed;
+        dir = DIR_RIGHT;
+      }
+    }
+    else if (randomDirSeed < 0.50) {
+      deltaY = currDot.speed;
+      dir = DIR_DOWN;
+    }
+    else {
+      deltaY = -currDot.speed;
+      dir = DIR_UP
+    }
+    canStep = true;
+    for (j = 0; j < candidateDots.length; j++) {
+      chck = candidateDots[j];
+    
+      if (chck.intersects({id: currDot.id, x: currDot.x + deltaX, y: currDot.y + deltaY, width: currDot.width, height: currDot.height})) {
+        canStep = false;
+      }
+    }
+    if (canStep) {
+      currDot.stalled = 0;
+      return dir;
+    }
+    currDot.stalled++;
+    return 0;
+  }
 };
+
 
 function spawn() {
   if (scene.maxPopulation() <= population) return;
-  if (Math.random() <= 1) {
+  if (Math.random() <= 0.3) {
     population++;
     var startY = Math.round(Math.random() * 1000) * scene.stageHeight() / 1000
     var newDot;
 
     if (Math.random() <= 0.5) {
       newDot = Dot("red", stage.redBase, startY);
+      if (! checkIfEmpty(newDot)) return;
       stage.redDots.push(newDot);  
     } else {
       newDot = Dot("blue", stage.blueBase, startY);
+      if (! checkIfEmpty(newDot)) return;
       stage.blueDots.push(newDot);
     }
     
     quad.insert(newDot);
   }
+}
+
+function checkIfEmpty(currDot) {
+  var candidateDots = quad.retrieve(currDot);
+  for (j = 0; j < candidateDots.length; j++) {
+    chck = candidateDots[j];
+        
+    if (chck.intersects(currDot)) {
+      return false;
+    }
+  }
+  return true;
 }
 
 function updateQuad() {

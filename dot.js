@@ -9,13 +9,14 @@ var Dot = function(color, startX, startY) {
   dot.height = scene.dotHeight();
   dot.x = startX;
   dot.y = startY
-
+  dot.color = color;
   dot.aim = color === "red" ? scene.stageWidth() - scene.dotWidth() : 1;
   dot.move = function(toX, toY) {
     dot.x = toX;
     dot.y = toY;
   };
   dot.intersects = function(otherDot) {
+    if (dot.id === otherDot.id) return false;  
     var intersX = false;
     var intersY = false;
     if (dot.x < otherDot.x && otherDot.x <= dot.x + dot.width) {
