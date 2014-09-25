@@ -4,7 +4,8 @@ var dotId = 0;
 
 var Dot = function(color, startX, startY) {
   var dot = {};
-  dot.speed = 1 + Math.round(Math.random() * 10) * 0.1;
+  var sgn = Math.round(Math.random() * 10) % 2 == 1 ? 1 : -1;
+  dot.speed = 1 + Math.round(Math.random() * 10) * 0.04 * sgn;
   dot.id = dotId;
   dotId++;
   dot.width = 15;
@@ -12,7 +13,7 @@ var Dot = function(color, startX, startY) {
   dot.x = startX;
   dot.y = startY
 
-  dot.aim = color === "red" ? 494 : 1;
+  dot.aim = color === "red" ? 485 : 1;
   dot.move = function(toX, toY) {
     dot.x = toX;
     dot.y = toY;
@@ -44,13 +45,13 @@ var Dot = function(color, startX, startY) {
 };
 
 var stepDot = function(dotToStep, dir) {
-  if (dir === 1) {
+  if (dir === 1 && dotToStep.y < 485) {
     dotToStep.move(dotToStep.x, dotToStep.y + dotToStep.speed);
   }
   if (dir === 2) {
     dotToStep.move(dotToStep.x + dotToStep.speed, dotToStep.y);
   }
-  if (dir === 3) {
+  if (dir === 3 && 16 < dotToStep.y) {
     dotToStep.move(dotToStep.x, dotToStep.y - dotToStep.speed);
   }
   if (dir === 4) {
@@ -59,9 +60,9 @@ var stepDot = function(dotToStep, dir) {
     
   // Move out to after-step-logic
   if (dotToStep.aim === 1 && dotToStep.x <= 1) {
-    dotToStep.aim = 494;
+    dotToStep.aim = 485;
   }
-  if (dotToStep.aim === 494 && 494 <= dotToStep.x) {
+  if (dotToStep.aim === 485 && 485 <= dotToStep.x) {
     dotToStep.aim = 1;
   }
 };
@@ -69,14 +70,18 @@ var stepDot = function(dotToStep, dir) {
 var calcDir = function(currDot, otherDots) {
   var chck;
   var toDir = 0;
-  // TODO increase to dir
 
   var candidateDots = quad.retrieve(currDot);
   for (j = 0; j < candidateDots.length; j++) {
     chck = candidateDots[j];
         
     if (chck.intersects(currDot)) {
-      return Math.random() <= 0.5 ? 1 : 3;
+      
+      var randomDirSeed = Math.random();
+      if (randomDirSeed < 0.04) currDot.aim === 485 ? currDot.aim = 1 : currDot.aim = 485;
+      if (randomDirSeed < 0.33) return 1;
+      if (randomDirSeed < 0.66) return 3;
+      return 0;
     }
   }
   
@@ -89,7 +94,7 @@ var Stage = function(w, h) {
   var stage = {};
   stage.size = {w: w, h: h};
   stage.redBase = 1;
-  stage.blueBase = 494;
+  stage.blueBase = 485;
   stage.redDots = [];
   stage.blueDots = [];
     
@@ -165,14 +170,14 @@ var quad = new QuadTree({
     height:stage.size.h
 });
 
-var MAX_POPULATION = 250;
+var MAX_POPULATION = 1200;
 var pupulation = 0;
 
 function spawn() {
   if (MAX_POPULATION <= pupulation) return;
   if (Math.random() <= 1) {
     pupulation++;
-    var startY = Math.round(Math.round(Math.random() * 1000) / 2) - 1;
+    var startY = Math.round(Math.round(Math.random() * 1000) / 2) - 5;
     var newDot;
 
     if (Math.random() <= 0.5) {
