@@ -1,10 +1,10 @@
-var STAGE_WIDTH = 500;
+var STAGE_WIDTH = 700;
 var STAGE_HEIGHT = 500;
 
-var DOT_WIDTH = 15;
-var DOT_HEIGHT = 3;
+var DOT_WIDTH = 12;
+var DOT_HEIGHT = 12;
 
-var MAX_POPULATION = 300;
+var MAX_POPULATION = 250;
 
 var DIR_DOWN = 1;
 var DIR_RIGHT = 2;
