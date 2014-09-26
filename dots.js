@@ -32,7 +32,7 @@ var Scene = function (max_population, stage_width, stage_height, dot_width, dot_
   this.changeHandler = function(newValue) {
     reset();
   }
-
+  this.highlightID = ko.numericObservable(-1);
   this.maxPopulation = ko.numericObservable(max_population);
   this.stageWidth = ko.numericObservable(stage_width);
   this.stageHeight = ko.numericObservable(stage_height);
@@ -78,14 +78,6 @@ var stepDot = function(dotToStep, dir) {
   if (dir === DIR_LEFT) {
     dotToStep.move(dotToStep.x - dotToStep.speed, dotToStep.y);
   }
-    
-  // TODO Wall hit event-handler
-  if (dotToStep.aim === 1 && dotToStep.x <= 1) {
-    dotToStep.aim = scene.stageWidth() - scene.dotWidth();
-  }
-  if (dotToStep.aim === (scene.stageWidth() - scene.dotWidth()) && (scene.stageWidth() - scene.dotWidth()) <= dotToStep.x) {
-    dotToStep.aim = 1;
-  }
 };
 
 var calcDir = function(currDot) {
@@ -98,40 +90,57 @@ var calcDir = function(currDot) {
   var canStep = true;
   var deltaX = currDot.x <= currDot.aim ? currDot.speed : -currDot.speed;
   
+  var bestDot = {found: 0, color: currDot.color};
   for (j = 0; j < candidateDots.length; j++) {
     chck = candidateDots[j];
-
+    if (bestDot.found < chck.found && currDot.aim === chck.aim && currDot.color === chck.color) bestDot = chck;
     if (chck.intersects({id: currDot.id, x: currDot.x + deltaX, y: currDot.y, width: currDot.width, height: currDot.height})) {
       canStep = false;
     }
   }
   
   if (canStep) {
+    currDot.found++;
     currDot.stalled = 0;
     if (currDot.x <= currDot.aim) return DIR_RIGHT;
     if (currDot.aim <= currDot.x) return DIR_LEFT;
   } else {
-    var randomDirSeed = Math.random();
+    if (0 < currDot.found) currDot.found = 0;
+    else currDot.found--;
     var deltaY = 0;
     var dir;
     deltaX = 0;
-    if (randomDirSeed < 0.04) {
-      if (currDot.x <= currDot.aim) {
-        deltaX = -currDot.speed;
-        dir = DIR_LEFT;
+    if (currDot.found < -30 && 10 < bestDot.found) {
+      if (currDot.y < bestDot.y) {
+        deltaY = currDot.speed;
+        dir = DIR_DOWN;
       }
       else {
-        deltaX = currDot.speed;
-        dir = DIR_RIGHT;
+        deltaY = -currDot.speed;
+        dir = DIR_UP
       }
     }
-    else if (randomDirSeed < 0.50) {
-      deltaY = currDot.speed;
-      dir = DIR_DOWN;
-    }
     else {
-      deltaY = -currDot.speed;
-      dir = DIR_UP
+      var randomDirSeed = Math.random();
+
+      if (randomDirSeed < 0.04) {
+        if (currDot.x <= currDot.aim) {
+          deltaX = -currDot.speed;
+          dir = DIR_LEFT;
+        }
+        else {
+          deltaX = currDot.speed;
+          dir = DIR_RIGHT;
+        }
+      }
+      else if (randomDirSeed < 0.50) {
+        deltaY = currDot.speed;
+        dir = DIR_DOWN;
+      }
+      else {
+        deltaY = -currDot.speed;
+        dir = DIR_UP
+      }
     }
     canStep = true;
     for (j = 0; j < candidateDots.length; j++) {
@@ -182,9 +191,10 @@ function checkIfEmpty(currDot) {
     }
   }
   return true;
-}
+};
 
 function updateQuad() {
+  quad.clear();
   var allDots = stage.redDots.concat(stage.blueDots);
   var currDot;
   for (i = 0; i < allDots.length; i++) {
@@ -193,15 +203,45 @@ function updateQuad() {
   }
 }
 
-function draw() {
-  spawn();
-  stage.clear();
+function update() {
   stage.draw();
   stage.step();
-  quad.clear();
+  updateWorld();
   updateQuad();
-  window.requestAnimationFrame(draw);
+  window.requestAnimationFrame(update);
 }
+
+function updateWorld() {
+  spawn();
+  var allDots = stage.redDots.concat(stage.blueDots);
+  var currDot;
+
+  for (i = 0; i < allDots.length; i++) {
+    currDot = allDots[i];
+    handleWallHit(currDot);
+  }
+};
+
+function handleWallHit2(currDot) {
+  var lastX = scene.stageWidth() - scene.dotWidth()
+  if (currDot.aim === 1 && currDot.x <= 1) {
+    if (! checkIfEmpty({x: lastX, y: currDot.y, width: currDot.width, height: currDot.height})) return;
+    currDot.x = lastX;
+  }
+  if (currDot.aim === lastX && lastX <= currDot.x) {
+    if (! checkIfEmpty({x: 1, y: currDot.y, width: currDot.width, height: currDot.height})) return;
+    currDot.x = 1;
+  }
+};
+
+function handleWallHit(currDot) {
+  if (currDot.aim === 1 && currDot.x <= 1) {
+    currDot.aim = scene.stageWidth() - scene.dotWidth();
+  }
+  if (currDot.aim === (scene.stageWidth() - scene.dotWidth()) && (scene.stageWidth() - scene.dotWidth()) <= currDot.x) {
+    currDot.aim = 1;
+  }
+};
 
 function reset() {
   population = 0;
@@ -212,4 +252,33 @@ function reset() {
   quad = new QuadTree({x:0, y:0, width:stage.size.w, height:stage.size.h});
 }
 
-draw();
+update();
+
+
+
+var bindEvent = function(element, type, handler) {
+    if (element.addEventListener) {
+        element.addEventListener(type, handler, false);
+    } else {
+        element.attachEvent('on'+type, handler);
+    }
+}
+
+function dotUnderPoint(x, y) {
+  var rect = canvas.getBoundingClientRect()
+  var allDots = stage.redDots.concat(stage.blueDots);
+  
+  var offset = {
+    top: rect.top + document.body.scrollTop,
+    left: rect.left + document.body.scrollLeft
+  };
+  var dotX = x - offset.left;
+  var dotY = y - offset.top;
+  for (i = 0; i < allDots.length; i++) {
+    currDot = allDots[i];
+    if (currDot.contains(dotX, dotY)) return currDot;
+  }
+  return null;
+};
+
+bindEvent(canvas, "click", function (e) { console.log(dotUnderPoint(e.clientX, e.clientY)) });

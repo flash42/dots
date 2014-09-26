@@ -24,7 +24,7 @@ var Stage = function(w, h) {
       currDot = stage.blueDots[i];
       toDir = calcDir(currDot);
       stepDot(currDot, toDir);
-    }     
+    }
   };
     
   stage.fieldDraw = function() {
@@ -39,14 +39,18 @@ var Stage = function(w, h) {
   };
     
   stage.dotsDraw = function() {
-    
+    var currDot;
     for (i = 0; i < stage.redDots.length; i++) {
-      ctx.fillStyle = "red";
+      currDot = stage.redDots[i];
+      if (scene.highlightID() == currDot.id) ctx.fillStyle = "black";
+      else ctx.fillStyle = "red";
       stage.redDots[i].draw();
       ctx.fill();
     }
     for (i = 0; i < stage.blueDots.length; i++) {
-      ctx.fillStyle = "blue";
+      currDot = stage.blueDots[i];
+      if (scene.highlightID() == currDot.id) ctx.fillStyle = "black";
+      else ctx.fillStyle = "blue";
       stage.blueDots[i].draw();
       ctx.fill();
     }
@@ -60,6 +64,7 @@ var Stage = function(w, h) {
   };
 
   stage.draw = function() {
+    stage.clear();
     stage.fieldDraw();
     stage.dotsDraw();
   };

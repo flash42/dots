@@ -8,6 +8,7 @@ var Dot = function(color, startX, startY) {
   dot.width = scene.dotWidth();
   dot.height = scene.dotHeight();
   dot.x = startX;
+  dot.found = 0;
   dot.y = startY
   dot.color = color;
   dot.aim = color === "red" ? scene.stageWidth() - scene.dotWidth() : 1;
@@ -15,6 +16,11 @@ var Dot = function(color, startX, startY) {
     dot.x = toX;
     dot.y = toY;
   };
+  
+  dot.contains = function(x, y) {
+    return dot.x <= x && x <= dot.x + dot.width && dot.y <= y && y <= dot.y + dot.height
+  };
+  
   dot.intersects = function(otherDot) {
     if (dot.id === otherDot.id) return false;  
     var intersX = false;
