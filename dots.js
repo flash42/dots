@@ -166,8 +166,8 @@ function spawn() {
     population++;
     var startY = Math.round(Math.random() * 1000) * scene.stageHeight() / 1000
     var newDot;
-
-    if (Math.random() <= 0.5) {
+    // TODO clean-up
+    if (Math.random() <= 1) {
       newDot = Dot("red", stage.redBase, startY);
       if (! checkIfEmpty(newDot)) return;
       stage.redDots.push(newDot);  
