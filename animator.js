@@ -3,9 +3,10 @@ var DIR_RIGHT = 2;
 var DIR_UP = 3;
 var DIR_LEFT = 4;
 
-var Animator = function(options, scene) {
+var Animator = function(options, quadTree, scene) {
     var animator = {};
     animator.scene = scene;
+    animator.quadTree = quadTree;
     animator.stepDot = function(entity, dir) {
         if (dir === DIR_DOWN && entity.y < options.stageWidth() - options.
             dotRadius()) {
@@ -26,7 +27,7 @@ var Animator = function(options, scene) {
         var toDir = 0;
 
         // TODO fix and use QuadTree - overlapping can happen
-        var candidateDots = quad.retrieve(entity);
+        var candidateDots = animator.quadTree.retrieve(entity);
         //var candidateDots = stage.blueDots.concat(stage.dots);
         var canStep = true;
         var deltaX = entity.x <= entity.aim ? entity.speed : -entity.speed;
@@ -120,6 +121,14 @@ var Animator = function(options, scene) {
             animator.handleWallHit(currDot);
         }
     };
+    
+    animator.setScene = function(scene) {
+        animator.scene = scene;
+    } 
+    
+    animator.setQuadTree = function(quadTree) {
+        animator.quadTree = quadTree;
+    }
 
     return animator;
 };

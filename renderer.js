@@ -2,7 +2,7 @@ var Renderer = function(scene) {
     var renderer = {};
     renderer.scene = scene;
 
-    renderer.fieldDraw = function() {
+    renderer.fieldDraw = function(ctx) {
         ctx.save();
         ctx.beginPath();
         ctx.strokeStyle = "green";
@@ -13,18 +13,18 @@ var Renderer = function(scene) {
         ctx.restore();
     };
 
-    renderer.dotsDraw = function() {
+    renderer.dotsDraw = function(ctx) {
         var currDot;
         for (i = 0; i < renderer.scene.entities.length; i++) {
             currDot = renderer.scene.entities[i];
-            // if (scene.highlightID() == currDot.id) ctx.fillStyle = "green";
+            // if (scene.highlightID() == currDot.id) renderer.ctx.fillStyle = "green";
             ctx.fillStyle = renderer.scene.dotColor;
-            renderer.scene.entities[i].draw();
+            renderer.scene.entities[i].draw(ctx);
             ctx.fill();
         }
     };
 
-    renderer.clear = function() {
+    renderer.clear = function(ctx) {
         ctx.save();
         ctx.clearRect(0, 0, renderer.scene.size.w, renderer.scene.size.h);
         ctx.fill();
@@ -35,10 +35,10 @@ var Renderer = function(scene) {
         renderer.scene = scene;
     }
 
-    renderer.render = function() {
-        renderer.clear();
-        renderer.fieldDraw();
-        renderer.dotsDraw();
+    renderer.render = function(ctx) {
+        renderer.clear(ctx);
+        renderer.fieldDraw(ctx);
+        renderer.dotsDraw(ctx);
     };
 
     return renderer;

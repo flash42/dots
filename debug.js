@@ -2,10 +2,6 @@
 var Debug = function(canvas, scene) {
     var debug = {};
     debug.scene = scene;
-
-    debug.setScene = function(scene) {
-        debug.scene = scene;
-    }
     
     debug.dotUnderPoint = function(x, y) {
         var rect = canvas.getBoundingClientRect()
@@ -16,11 +12,15 @@ var Debug = function(canvas, scene) {
         };
         var dotX = x - offset.left;
         var dotY = y - offset.top;
-        for (i = 0; i < scene.entities.length; i++) {
-            currDot = scene.entities[i];
+        for (i = 0; i < debug.scene.entities.length; i++) {
+            currDot = debug.scene.entities[i];
             if (currDot.contains(dotX, dotY)) return currDot;
         }
         return null;
+    }
+    
+    debug.setScene = function (scene) {
+        debug.scene = scene;
     }
     
     debug._bindEvent = function(element, type, handler) {

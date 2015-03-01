@@ -1,10 +1,9 @@
 
-var Dot = function(color, startX, startY, options) {
+var Dot = function(color, startX, startY, options, dotId) {
   var dot = {};
   var sgn = Math.round(Math.random() * 10) % 2 == 1 ? 1 : -1;
   dot.speed = 1 + Math.round(Math.random() * 10) * 0.04 * sgn;
   dot.id = dotId;
-  dotId++;
   dot.radius = options.dotRadius();
   dot.x = startX;
   dot.found = 0;
@@ -28,7 +27,7 @@ var Dot = function(color, startX, startY, options) {
         && Math.abs(dot.y - otherDot.y) < dot.radius;
   };
     
-  dot.draw = function() {
+  dot.draw = function(ctx) {
     ctx.beginPath();
     ctx.arc(dot.x, dot.y, dot.radius / 2, 0, 2*Math.PI);
     ctx.closePath();

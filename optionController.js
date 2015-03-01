@@ -1,4 +1,5 @@
 
+
 var OptionController = function(max_population, stage_width, stage_height, dot_radius, resetHandler) {
     var optionController = {};
 
@@ -19,7 +20,7 @@ var OptionController = function(max_population, stage_width, stage_height, dot_r
     };
 
     optionController.changeHandler = function(newValue) {
-        reset();
+        resetHandler();
     }
     optionController.highlightID = ko.numericObservable(-1);
     optionController.maxPopulation = ko.numericObservable(max_population);
