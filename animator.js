@@ -104,8 +104,8 @@ var Animator = function(options, scene) {
         var currDot;
         var toDir;
 
-        for (i = 0; i < animator.scene.dots.length; i++) {
-            currDot = animator.scene.dots[i];
+        for (i = 0; i < animator.scene.entities.length; i++) {
+            currDot = animator.scene.entities[i];
             toDir = animator.calcDir(currDot);
             animator.stepDot(currDot, toDir);
         }
