@@ -10,114 +10,20 @@ ko.applyBindings(options);
 // ++++++++++++++
 // Initialization +
 // ++++++++++++++
-  
-var population = 0;
-var stage = Scene(options.stageWidth(), options.stageHeight());
+ 
+var scene = new Scene(options.stageWidth(), options.stageHeight());
+var animator = new Animator(options, scene);
 var canvas = document.getElementById('canv-1');
 var ctx = canvas.getContext('2d');
 var dotId = 0;
+var population = 0;
 
-var quad = new QuadTree({
-  x:0,
-      y:0,
-      width:stage.size.w,
-      height:stage.size.h
-      });
+quad = new QuadTree({x:0, y:0, width:scene.size.w, height:scene.size.h});
 
-var stepDot = function(dotToStep, dir) {
-  if (dir === DIR_DOWN && dotToStep.y < options.stageWidth() - options.
-      dotRadius()) {
-    dotToStep.move(dotToStep.x, dotToStep.y + dotToStep.speed);
-  }
-  if (dir === DIR_RIGHT) {
-    dotToStep.move(dotToStep.x + dotToStep.speed, dotToStep.y);
-  }
-  if (dir === DIR_UP && options.dotRadius() + dotToStep.speed < dotToStep.y) {
-    dotToStep.move(dotToStep.x, dotToStep.y - dotToStep.speed);
-  }
-  if (dir === DIR_LEFT) {
-    dotToStep.move(dotToStep.x - dotToStep.speed, dotToStep.y);
-  }
-};
 
-var calcDir = function(currDot) {
-  var chck;
-  var toDir = 0;
 
-  // TODO fix and use QuadTree - overlapping can happen
-  var candidateDots = quad.retrieve(currDot);
-  //var candidateDots = stage.blueDots.concat(stage.dots);
-  var canStep = true;
-  var deltaX = currDot.x <= currDot.aim ? currDot.speed : -currDot.speed;
-  
-  var bestDot = {found: 0, color: currDot.color};
-  for (j = 0; j < candidateDots.length; j++) {
-    chck = candidateDots[j];
-    if (bestDot.found < chck.found && currDot.aim === chck.aim && currDot.color === chck.color) bestDot = chck;
-    if (chck.intersects({id: currDot.id, x: currDot.x + deltaX, y: currDot.y, width: currDot.width, height: currDot.height})) {
-      canStep = false;
-    }
-  }
-  
-  if (canStep) {
-    currDot.found++;
-    currDot.stalled = 0;
-    if (currDot.x <= currDot.aim) return DIR_RIGHT;
-    if (currDot.aim <= currDot.x) return DIR_LEFT;
-  } else {
-    if (0 < currDot.found) currDot.found = 0;
-    else currDot.found--;
-    var deltaY = 0;
-    var dir;
-    deltaX = 0;
-    if (currDot.found < -30 && 10 < bestDot.found) {
-      if (currDot.y < bestDot.y) {
-        deltaY = currDot.speed;
-        dir = DIR_DOWN;
-      }
-      else {
-        deltaY = -currDot.speed;
-        dir = DIR_UP
-      }
-    }
-    else {
-      var randomDirSeed = Math.random();
 
-      if (randomDirSeed < 0.04) {
-        if (currDot.x <= currDot.aim) {
-          deltaX = -currDot.speed;
-          dir = DIR_LEFT;
-        }
-        else {
-          deltaX = currDot.speed;
-          dir = DIR_RIGHT;
-        }
-      }
-      else if (randomDirSeed < 0.50) {
-        deltaY = currDot.speed;
-        dir = DIR_DOWN;
-      }
-      else {
-        deltaY = -currDot.speed;
-        dir = DIR_UP
-      }
-    }
-    canStep = true;
-    for (j = 0; j < candidateDots.length; j++) {
-      chck = candidateDots[j];
-    
-      if (chck.intersects({id: currDot.id, x: currDot.x + deltaX, y: currDot.y + deltaY, width: currDot.width, height: currDot.height})) {
-        canStep = false;
-      }
-    }
-    if (canStep) {
-      currDot.stalled = 0;
-      return dir;
-    }
-    currDot.stalled++;
-    return 0;
-  }
-};
+
 
 
 function spawn() {
@@ -126,9 +32,9 @@ function spawn() {
     population++;
     var startY = Math.round(Math.random() * 1000) * options.stageHeight() / 1000
     var newDot;
-    newDot = Dot(stage.dotColor, 1, startY, options);
+    newDot = Dot(scene.dotColor, 1, startY, options);
     if (! checkIfEmpty(newDot)) return;
-    stage.dots.push(newDot);
+    scene.dots.push(newDot);
     
     quad.insert(newDot);
   }
@@ -149,15 +55,15 @@ function checkIfEmpty(currDot) {
 function updateQuad() {
   quad.clear();
   var currDot;
-  for (i = 0; i < stage.dots.length; i++) {
-    currDot = stage.dots[i];
+  for (i = 0; i < scene.dots.length; i++) {
+    currDot = scene.dots[i];
     quad.insert(currDot);
   }
 }
 
 function update() {
-  stage.draw();
-  stage.step();
+  scene.draw();
+  animator.update();
   updateWorld();
   updateQuad();
   window.requestAnimationFrame(update);
@@ -166,8 +72,8 @@ function update() {
 function updateWorld() {
   spawn();
   var currDot;
-  for (i = 0; i < stage.dots.length; i++) {
-    currDot = stage.dots[i];
+  for (i = 0; i < scene.dots.length; i++) {
+    currDot = scene.dots[i];
     handleWallHit(currDot);
   }
 };
@@ -184,10 +90,11 @@ function handleWallHit(currDot) {
 function reset() {
   population = 0;
   dotId = 0;
-  stage = Scene(options.stageWidth(), options.stageHeight());
-  canvas.width = stage.size.w;
-  canvas.height = stage.size.h;
-  quad = new QuadTree({x:0, y:0, width:stage.size.w, height:stage.size.h});
+  scene = new Scene(options.stageWidth(), options.stageHeight());
+  animator = new Animator(options, scene);
+  canvas.width = scene.size.w;
+  canvas.height = scene.size.h;
+  quad = new QuadTree({x:0, y:0, width:scene.size.w, height:scene.size.h});
 }
 
 
@@ -209,8 +116,8 @@ function dotUnderPoint(x, y) {
   };
   var dotX = x - offset.left;
   var dotY = y - offset.top;
-  for (i = 0; i < stage.dots.length; i++) {
-    currDot = stage.dots[i];
+  for (i = 0; i < scene.dots.length; i++) {
+    currDot = scene.dots[i];
     if (currDot.contains(dotX, dotY)) return currDot;
   }
   return null;

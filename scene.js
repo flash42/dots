@@ -4,18 +4,7 @@ var Scene = function(w, h) {
   scene.dotColor = "red";
   scene.size = {w: w, h: h};
   scene.dots = [];
-    
-  scene.step = function () {
-    var currDot;
-    var toDir;
-    
-    for (i = 0; i < scene.dots.length; i++) {
-      currDot = scene.dots[i];
-      toDir = calcDir(currDot);
-      stepDot(currDot, toDir);
-    }
-  };
-    
+      
   scene.fieldDraw = function() {
     ctx.save();
     ctx.beginPath();
