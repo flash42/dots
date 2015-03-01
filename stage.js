@@ -31,8 +31,8 @@ var Stage = function(w, h) {
     var currDot;
     for (i = 0; i < stage.dots.length; i++) {
       currDot = stage.dots[i];
-      if (scene.highlightID() == currDot.id) ctx.fillStyle = "green";
-      else ctx.fillStyle = stage.dotColor;
+      // if (scene.highlightID() == currDot.id) ctx.fillStyle = "green";
+      ctx.fillStyle = stage.dotColor;
       stage.dots[i].draw();
       ctx.fill();
     }

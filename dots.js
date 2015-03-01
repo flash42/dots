@@ -26,7 +26,7 @@ ko.numericObservable = function(initialValue) {
 };
 
 
-var Scene = function (max_population, stage_width, stage_height, dot_radius) {
+var Options = function (max_population, stage_width, stage_height, dot_radius) {
   this.changeHandler = function(newValue) {
     reset();
   }
@@ -41,15 +41,15 @@ var Scene = function (max_population, stage_width, stage_height, dot_radius) {
   this.dotRadius.subscribe(this.changeHandler);
 };
 
-var scene = new Scene(MAX_POPULATION, STAGE_WIDTH, STAGE_HEIGHT, DOT_RADIUS)
-ko.applyBindings(scene);
+var options = new Options(MAX_POPULATION, STAGE_WIDTH, STAGE_HEIGHT, DOT_RADIUS)
+ko.applyBindings(options);
 
 // ++++++++++++++
 // Initialization +
 // ++++++++++++++
   
 var population = 0;
-var stage = Stage(scene.stageWidth(), scene.stageHeight());
+var stage = Stage(options.stageWidth(), options.stageHeight());
 var canvas = document.getElementById('canv-1');
 var ctx = canvas.getContext('2d');
 var dotId = 0;
@@ -62,14 +62,14 @@ var quad = new QuadTree({
       });
 
 var stepDot = function(dotToStep, dir) {
-  if (dir === DIR_DOWN && dotToStep.y < scene.stageWidth() - scene.
+  if (dir === DIR_DOWN && dotToStep.y < options.stageWidth() - options.
       dotRadius()) {
     dotToStep.move(dotToStep.x, dotToStep.y + dotToStep.speed);
   }
   if (dir === DIR_RIGHT) {
     dotToStep.move(dotToStep.x + dotToStep.speed, dotToStep.y);
   }
-  if (dir === DIR_UP && scene.dotRadius() + dotToStep.speed < dotToStep.y) {
+  if (dir === DIR_UP && options.dotRadius() + dotToStep.speed < dotToStep.y) {
     dotToStep.move(dotToStep.x, dotToStep.y - dotToStep.speed);
   }
   if (dir === DIR_LEFT) {
@@ -158,12 +158,12 @@ var calcDir = function(currDot) {
 
 
 function spawn() {
-  if (scene.maxPopulation() <= population) return;
+  if (options.maxPopulation() <= population) return;
   if (Math.random() <= 0.3) {
     population++;
-    var startY = Math.round(Math.random() * 1000) * scene.stageHeight() / 1000
+    var startY = Math.round(Math.random() * 1000) * options.stageHeight() / 1000
     var newDot;
-    newDot = Dot(stage.dotColor, 1, startY);
+    newDot = Dot(stage.dotColor, 1, startY, options);
     if (! checkIfEmpty(newDot)) return;
     stage.dots.push(newDot);
     
@@ -211,9 +211,9 @@ function updateWorld() {
 
 function handleWallHit(currDot) {
   if (currDot.aim === 1 && currDot.x <= 1) {
-    currDot.aim = scene.stageWidth() - scene.dotRadius();
+    currDot.aim = options.stageWidth() - options.dotRadius();
   }
-  if (currDot.aim === (scene.stageWidth() - scene.dotRadius()) && (scene.stageWidth() - scene.dotRadius()) <= currDot.x) {
+  if (currDot.aim === (options.stageWidth() - options.dotRadius()) && (options.stageWidth() - options.dotRadius()) <= currDot.x) {
     currDot.aim = 1;
   }
 };
@@ -221,7 +221,7 @@ function handleWallHit(currDot) {
 function reset() {
   population = 0;
   dotId = 0;
-  stage = Stage(scene.stageWidth(), scene.stageHeight());
+  stage = Stage(options.stageWidth(), options.stageHeight());
   canvas.width = stage.size.w;
   canvas.height = stage.size.h;
   quad = new QuadTree({x:0, y:0, width:stage.size.w, height:stage.size.h});
