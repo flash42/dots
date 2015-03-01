@@ -21,7 +21,8 @@ var dotId = 0;
 var population = 0;
 
 
-quad = new QuadTree({x:0, y:0, width:scene.size.w, height:scene.size.h});
+var quad = new QuadTree({x:0, y:0, width:scene.size.w, height:scene.size.h});
+var director = new Director(quad);
 
 
 
@@ -29,31 +30,6 @@ quad = new QuadTree({x:0, y:0, width:scene.size.w, height:scene.size.h});
 
 
 
-function spawn() {
-  if (options.maxPopulation() <= population) return;
-  if (Math.random() <= 0.3) {
-    population++;
-    var startY = Math.round(Math.random() * 1000) * options.stageHeight() / 1000
-    var newDot;
-    newDot = Dot(scene.dotColor, 1, startY, options);
-    if (! checkIfEmpty(newDot)) return;
-    scene.entities.push(newDot);
-    
-    quad.insert(newDot);
-  }
-}
-
-function checkIfEmpty(currDot) {
-  var candidateDots = quad.retrieve(currDot);
-  for (j = 0; j < candidateDots.length; j++) {
-    chck = candidateDots[j];
-        
-    if (chck.intersects(currDot)) {
-      return false;
-    }
-  }
-  return true;
-};
 
 function updateQuad() {
   quad.clear();
@@ -67,7 +43,6 @@ function updateQuad() {
 
 
 function updateWorld() {
-  spawn();
   var currDot;
   for (i = 0; i < scene.entities.length; i++) {
     currDot = scene.entities[i];
@@ -94,10 +69,12 @@ function reset() {
   canvas.width = scene.size.w;
   canvas.height = scene.size.h;
   quad = new QuadTree({x:0, y:0, width:scene.size.w, height:scene.size.h});
+  director.setQuadTree(quad)
 }
 
 
 function update() {
+  director.update();
   animator.update();
   updateWorld();
   updateQuad();
