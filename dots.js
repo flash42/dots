@@ -20,15 +20,8 @@ var ctx = canvas.getContext('2d');
 var dotId = 0;
 var population = 0;
 
-
 var quad = new QuadTree({x:0, y:0, width:scene.size.w, height:scene.size.h});
 var director = new Director(quad);
-
-
-
-
-
-
 
 
 function updateQuad() {
@@ -39,25 +32,6 @@ function updateQuad() {
     quad.insert(currDot);
   }
 }
-
-
-
-function updateWorld() {
-  var currDot;
-  for (i = 0; i < scene.entities.length; i++) {
-    currDot = scene.entities[i];
-    handleWallHit(currDot);
-  }
-};
-
-function handleWallHit(currDot) {
-  if (currDot.aim === 1 && currDot.x <= 1) {
-    currDot.aim = options.stageWidth() - options.dotRadius();
-  }
-  if (currDot.aim === (options.stageWidth() - options.dotRadius()) && (options.stageWidth() - options.dotRadius()) <= currDot.x) {
-    currDot.aim = 1;
-  }
-};
 
 function reset() {
   population = 0;
@@ -76,7 +50,6 @@ function reset() {
 function update() {
   director.update();
   animator.update();
-  updateWorld();
   updateQuad();
   renderer.render();
 

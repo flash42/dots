@@ -100,6 +100,15 @@ var Animator = function(options, scene) {
         }
     };
 
+    animator.handleWallHit = function (currDot) {
+        if (currDot.aim === 1 && currDot.x <= 1) {
+            currDot.aim = options.stageWidth() - options.dotRadius();
+        }
+        if (currDot.aim === (options.stageWidth() - options.dotRadius()) && (options.stageWidth() - options.dotRadius()) <= currDot.x) {
+            currDot.aim = 1;
+        }
+    };
+
     animator.update = function () {
         var currDot;
         var toDir;
@@ -108,6 +117,7 @@ var Animator = function(options, scene) {
             currDot = animator.scene.entities[i];
             toDir = animator.calcDir(currDot);
             animator.stepDot(currDot, toDir);
+            animator.handleWallHit(currDot);
         }
     };
 
