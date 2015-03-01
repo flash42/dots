@@ -5,45 +5,34 @@ var Dot = function(color, startX, startY) {
   dot.speed = 1 + Math.round(Math.random() * 10) * 0.04 * sgn;
   dot.id = dotId;
   dotId++;
-  dot.width = scene.dotWidth();
-  dot.height = scene.dotHeight();
+  dot.radius = scene.dotRadius();
   dot.x = startX;
   dot.found = 0;
   dot.y = startY
   dot.color = color;
-  dot.aim = color === "red" ? scene.stageWidth() - scene.dotWidth() : 1;
+  dot.aim = scene.stageWidth() - scene.dotRadius();
+  
   dot.move = function(toX, toY) {
     dot.x = toX;
     dot.y = toY;
   };
   
   dot.contains = function(x, y) {
-    return dot.x <= x && x <= dot.x + dot.width && dot.y <= y && y <= dot.y + dot.height
+    return dot.x <= x && x <= dot.x + dot.radius && dot.y <= y && y <= dot.y + dot.radius
   };
   
   dot.intersects = function(otherDot) {
     if (dot.id === otherDot.id) return false;  
-    var intersX = false;
-    var intersY = false;
-    if (dot.x < otherDot.x && otherDot.x <= dot.x + dot.width) {
-      intersX = true; 
-    }
-    if (otherDot.x < dot.x && dot.x <= otherDot.x + otherDot.width ) {
-      intersX = true; 
-    }
-    if (dot.y <= otherDot.y && otherDot.y <= dot.y + dot.height) {
-      intersY = true; 
-    }
-    if (otherDot.y <= dot.y && dot.y <= otherDot.y + otherDot.height) {
-      intersY = true;
-    }
         
-    return intersX && intersY;
-  };  
+    return Math.abs(dot.x - otherDot.x) < dot.radius 
+        && Math.abs(dot.y - otherDot.y) < dot.radius;
+  };
+    
   dot.draw = function() {
     ctx.beginPath();
-    ctx.rect(dot.x, dot.y, dot.width, dot.height);
+    ctx.arc(dot.x, dot.y, dot.radius / 2, 0, 2*Math.PI);
     ctx.closePath();
   };
+    
   return dot;
 };

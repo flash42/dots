@@ -1,8 +1,6 @@
 var STAGE_WIDTH = 700;
 var STAGE_HEIGHT = 500;
-
-var DOT_WIDTH = 12;
-var DOT_HEIGHT = 12;
+var DOT_RADIUS = 12;
 
 var MAX_POPULATION = 250;
 
@@ -28,7 +26,7 @@ ko.numericObservable = function(initialValue) {
 };
 
 
-var Scene = function (max_population, stage_width, stage_height, dot_width, dot_height) {
+var Scene = function (max_population, stage_width, stage_height, dot_radius) {
   this.changeHandler = function(newValue) {
     reset();
   }
@@ -36,16 +34,14 @@ var Scene = function (max_population, stage_width, stage_height, dot_width, dot_
   this.maxPopulation = ko.numericObservable(max_population);
   this.stageWidth = ko.numericObservable(stage_width);
   this.stageHeight = ko.numericObservable(stage_height);
-  this.dotWidth = ko.numericObservable(dot_width);
-  this.dotHeight = ko.numericObservable(dot_height);
+  this.dotRadius = ko.numericObservable(dot_radius);
   this.maxPopulation.subscribe(this.changeHandler);
   this.stageWidth.subscribe(this.changeHandler);
   this.stageHeight.subscribe(this.changeHandler);
-  this.dotWidth.subscribe(this.changeHandler);
-  this.dotHeight.subscribe(this.changeHandler);
+  this.dotRadius.subscribe(this.changeHandler);
 };
 
-var scene = new Scene(MAX_POPULATION, STAGE_WIDTH, STAGE_HEIGHT, DOT_WIDTH, DOT_HEIGHT)
+var scene = new Scene(MAX_POPULATION, STAGE_WIDTH, STAGE_HEIGHT, DOT_RADIUS)
 ko.applyBindings(scene);
 
 // ++++++++++++++
@@ -66,13 +62,14 @@ var quad = new QuadTree({
       });
 
 var stepDot = function(dotToStep, dir) {
-  if (dir === DIR_DOWN && dotToStep.y < scene.stageWidth() - scene.dotWidth()) {
+  if (dir === DIR_DOWN && dotToStep.y < scene.stageWidth() - scene.
+      dotRadius()) {
     dotToStep.move(dotToStep.x, dotToStep.y + dotToStep.speed);
   }
   if (dir === DIR_RIGHT) {
     dotToStep.move(dotToStep.x + dotToStep.speed, dotToStep.y);
   }
-  if (dir === DIR_UP && scene.dotWidth() + dotToStep.speed < dotToStep.y) {
+  if (dir === DIR_UP && scene.dotRadius() + dotToStep.speed < dotToStep.y) {
     dotToStep.move(dotToStep.x, dotToStep.y - dotToStep.speed);
   }
   if (dir === DIR_LEFT) {
@@ -86,7 +83,7 @@ var calcDir = function(currDot) {
 
   // TODO fix and use QuadTree - overlapping can happen
   var candidateDots = quad.retrieve(currDot);
-  //var candidateDots = stage.blueDots.concat(stage.redDots);
+  //var candidateDots = stage.blueDots.concat(stage.dots);
   var canStep = true;
   var deltaX = currDot.x <= currDot.aim ? currDot.speed : -currDot.speed;
   
@@ -166,16 +163,9 @@ function spawn() {
     population++;
     var startY = Math.round(Math.random() * 1000) * scene.stageHeight() / 1000
     var newDot;
-    // TODO clean-up
-    if (Math.random() <= 1) {
-      newDot = Dot("red", stage.redBase, startY);
-      if (! checkIfEmpty(newDot)) return;
-      stage.redDots.push(newDot);  
-    } else {
-      newDot = Dot("blue", stage.blueBase, startY);
-      if (! checkIfEmpty(newDot)) return;
-      stage.blueDots.push(newDot);
-    }
+    newDot = Dot(stage.dotColor, 1, startY);
+    if (! checkIfEmpty(newDot)) return;
+    stage.dots.push(newDot);
     
     quad.insert(newDot);
   }
@@ -195,10 +185,9 @@ function checkIfEmpty(currDot) {
 
 function updateQuad() {
   quad.clear();
-  var allDots = stage.redDots.concat(stage.blueDots);
   var currDot;
-  for (i = 0; i < allDots.length; i++) {
-    currDot = allDots[i];
+  for (i = 0; i < stage.dots.length; i++) {
+    currDot = stage.dots[i];
     quad.insert(currDot);
   }
 }
@@ -213,32 +202,18 @@ function update() {
 
 function updateWorld() {
   spawn();
-  var allDots = stage.redDots.concat(stage.blueDots);
   var currDot;
-
-  for (i = 0; i < allDots.length; i++) {
-    currDot = allDots[i];
+  for (i = 0; i < stage.dots.length; i++) {
+    currDot = stage.dots[i];
     handleWallHit(currDot);
-  }
-};
-
-function handleWallHit2(currDot) {
-  var lastX = scene.stageWidth() - scene.dotWidth()
-  if (currDot.aim === 1 && currDot.x <= 1) {
-    if (! checkIfEmpty({x: lastX, y: currDot.y, width: currDot.width, height: currDot.height})) return;
-    currDot.x = lastX;
-  }
-  if (currDot.aim === lastX && lastX <= currDot.x) {
-    if (! checkIfEmpty({x: 1, y: currDot.y, width: currDot.width, height: currDot.height})) return;
-    currDot.x = 1;
   }
 };
 
 function handleWallHit(currDot) {
   if (currDot.aim === 1 && currDot.x <= 1) {
-    currDot.aim = scene.stageWidth() - scene.dotWidth();
+    currDot.aim = scene.stageWidth() - scene.dotRadius();
   }
-  if (currDot.aim === (scene.stageWidth() - scene.dotWidth()) && (scene.stageWidth() - scene.dotWidth()) <= currDot.x) {
+  if (currDot.aim === (scene.stageWidth() - scene.dotRadius()) && (scene.stageWidth() - scene.dotRadius()) <= currDot.x) {
     currDot.aim = 1;
   }
 };
@@ -252,8 +227,6 @@ function reset() {
   quad = new QuadTree({x:0, y:0, width:stage.size.w, height:stage.size.h});
 }
 
-update();
-
 
 
 var bindEvent = function(element, type, handler) {
@@ -266,7 +239,6 @@ var bindEvent = function(element, type, handler) {
 
 function dotUnderPoint(x, y) {
   var rect = canvas.getBoundingClientRect()
-  var allDots = stage.redDots.concat(stage.blueDots);
   
   var offset = {
     top: rect.top + document.body.scrollTop,
@@ -274,11 +246,12 @@ function dotUnderPoint(x, y) {
   };
   var dotX = x - offset.left;
   var dotY = y - offset.top;
-  for (i = 0; i < allDots.length; i++) {
-    currDot = allDots[i];
+  for (i = 0; i < stage.dots.length; i++) {
+    currDot = stage.dots[i];
     if (currDot.contains(dotX, dotY)) return currDot;
   }
   return null;
 };
 
 bindEvent(canvas, "click", function (e) { console.log(dotUnderPoint(e.clientX, e.clientY)) });
+update();

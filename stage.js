@@ -1,27 +1,16 @@
 
 var Stage = function(w, h) {
   var stage = {};
+  stage.dotColor = "red";
   stage.size = {w: w, h: h};
-  stage.redBase = 1;
-  stage.blueBase = (scene.stageWidth() - scene.dotWidth());
-  stage.redDots = [];
-  stage.blueDots = [];
+  stage.dots = [];
     
   stage.step = function () {
     var currDot;
     var toDir;
-    var chck;
-    var steppedDot;
-    var allDots = stage.redDots.concat(stage.blueDots);
     
-    for (i = 0; i < stage.redDots.length; i++) {
-      currDot = stage.redDots[i];
-      toDir = calcDir(currDot);
-      stepDot(currDot, toDir);
-    }
-        
-    for (i = 0; i < stage.blueDots.length; i++) {
-      currDot = stage.blueDots[i];
+    for (i = 0; i < stage.dots.length; i++) {
+      currDot = stage.dots[i];
       toDir = calcDir(currDot);
       stepDot(currDot, toDir);
     }
@@ -40,18 +29,11 @@ var Stage = function(w, h) {
     
   stage.dotsDraw = function() {
     var currDot;
-    for (i = 0; i < stage.redDots.length; i++) {
-      currDot = stage.redDots[i];
-      if (scene.highlightID() == currDot.id) ctx.fillStyle = "black";
-      else ctx.fillStyle = "red";
-      stage.redDots[i].draw();
-      ctx.fill();
-    }
-    for (i = 0; i < stage.blueDots.length; i++) {
-      currDot = stage.blueDots[i];
-      if (scene.highlightID() == currDot.id) ctx.fillStyle = "black";
-      else ctx.fillStyle = "blue";
-      stage.blueDots[i].draw();
+    for (i = 0; i < stage.dots.length; i++) {
+      currDot = stage.dots[i];
+      if (scene.highlightID() == currDot.id) ctx.fillStyle = "green";
+      else ctx.fillStyle = stage.dotColor;
+      stage.dots[i].draw();
       ctx.fill();
     }
   };
