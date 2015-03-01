@@ -1,32 +1,31 @@
-var Renderer = function(scene) {
+var Renderer = function() {
     var renderer = {};
-    renderer.scene = scene;
 
-    renderer.fieldDraw = function(ctx) {
+    renderer.fieldDraw = function(scene, ctx) {
         ctx.save();
         ctx.beginPath();
         ctx.strokeStyle = "green";
         ctx.lineWidth = "1";
-        ctx.rect(0, 0, renderer.scene.size.w, renderer.scene.size.h);
+        ctx.rect(0, 0, scene.size.w, scene.size.h);
         ctx.stroke();
         ctx.closePath();
         ctx.restore();
     };
 
-    renderer.dotsDraw = function(ctx) {
+    renderer.dotsDraw = function(scene, ctx) {
         var currDot;
-        for (i = 0; i < renderer.scene.entities.length; i++) {
-            currDot = renderer.scene.entities[i];
-            // if (scene.highlightID() == currDot.id) renderer.ctx.fillStyle = "green";
-            ctx.fillStyle = renderer.scene.dotColor;
-            renderer.scene.entities[i].draw(ctx);
+        for (i = 0; i < scene.entities.length; i++) {
+            currDot = scene.entities[i];
+            // if (scene.highlightID() == currDot.id) ctx.fillStyle = "green";
+            ctx.fillStyle = scene.dotColor;
+            scene.entities[i].draw(ctx);
             ctx.fill();
         }
     };
 
-    renderer.clear = function(ctx) {
+    renderer.clear = function(scene, ctx) {
         ctx.save();
-        ctx.clearRect(0, 0, renderer.scene.size.w, renderer.scene.size.h);
+        ctx.clearRect(0, 0, scene.size.w, scene.size.h);
         ctx.fill();
         ctx.restore(); 
     };
@@ -35,10 +34,10 @@ var Renderer = function(scene) {
         renderer.scene = scene;
     }
 
-    renderer.render = function(ctx) {
-        renderer.clear(ctx);
-        renderer.fieldDraw(ctx);
-        renderer.dotsDraw(ctx);
+    renderer.render = function(scene, ctx) {
+        renderer.clear(scene, ctx);
+        renderer.fieldDraw(scene, ctx);
+        renderer.dotsDraw(scene, ctx);
     };
 
     return renderer;

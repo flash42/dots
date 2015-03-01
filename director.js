@@ -1,20 +1,19 @@
-var Director = function(quadTree, options, scene) {
+var Director = function(quadTree, options) {
     var director = {};
     director.quadTree = quadTree;
     population = 0;
     dotId = 0;
-    director.scene = scene;
     
-    director.spawn = function () {
+    director.spawn = function (scene) {
         if (options.maxPopulation() <= director.population) return;
         if (Math.random() <= 0.3) {
             director.population++;
             var startY = Math.round(Math.random() * 1000) * options.stageHeight() / 1000
             var newDot;
-            newDot = Dot(director.scene.dotColor, 1, startY, options);
+            newDot = Dot(scene.dotColor, 1, startY, options);
             director.dotId++;
             if (! director.checkIfEmpty(newDot)) return;
-            director.scene.entities.push(newDot);
+            scene.entities.push(newDot);
 
             director.quadTree.insert(newDot);
         }
@@ -36,14 +35,13 @@ var Director = function(quadTree, options, scene) {
         director.quadTree = quadTree;
     }
 
-    director.setScene = function(scene) {
-        director.scene = scene;
+    director.reset = function() {
         director.population = 0;
         director.dotId = 0;
     }
 
     director.update = function(scene) {
-        director.spawn();  
+        director.spawn(scene);  
     }
 
     return director;

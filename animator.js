@@ -3,10 +3,10 @@ var DIR_RIGHT = 2;
 var DIR_UP = 3;
 var DIR_LEFT = 4;
 
-var Animator = function(options, quadTree, scene) {
+var Animator = function(options, quadTree) {
     var animator = {};
-    animator.scene = scene;
     animator.quadTree = quadTree;
+    
     animator.stepDot = function(entity, dir) {
         if (dir === DIR_DOWN && entity.y < options.stageWidth() - options.
             dotRadius()) {
@@ -110,21 +110,17 @@ var Animator = function(options, quadTree, scene) {
         }
     };
 
-    animator.update = function () {
+    animator.update = function (scene) {
         var currDot;
         var toDir;
 
-        for (i = 0; i < animator.scene.entities.length; i++) {
-            currDot = animator.scene.entities[i];
+        for (i = 0; i < scene.entities.length; i++) {
+            currDot = scene.entities[i];
             toDir = animator.calcDir(currDot);
             animator.stepDot(currDot, toDir);
             animator.handleWallHit(currDot);
         }
     };
-    
-    animator.setScene = function(scene) {
-        animator.scene = scene;
-    } 
     
     animator.setQuadTree = function(quadTree) {
         animator.quadTree = quadTree;
