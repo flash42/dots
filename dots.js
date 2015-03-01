@@ -1,47 +1,10 @@
-var STAGE_WIDTH = 700;
-var STAGE_HEIGHT = 500;
-var DOT_RADIUS = 12;
-
-var MAX_POPULATION = 250;
-
 var DIR_DOWN = 1;
 var DIR_RIGHT = 2;
 var DIR_UP = 3;
 var DIR_LEFT = 4;
 
-ko.numericObservable = function(initialValue) {
-    var _actual = ko.observable(initialValue);
 
-    var result = ko.dependentObservable({
-        read: function() {
-            return _actual();
-        },
-        write: function(newValue) {
-            var parsedValue = parseFloat(newValue);
-            _actual(isNaN(parsedValue) ? newValue : parsedValue);
-        }
-    });
-
-    return result;
-};
-
-
-var Options = function (max_population, stage_width, stage_height, dot_radius) {
-  this.changeHandler = function(newValue) {
-    reset();
-  }
-  this.highlightID = ko.numericObservable(-1);
-  this.maxPopulation = ko.numericObservable(max_population);
-  this.stageWidth = ko.numericObservable(stage_width);
-  this.stageHeight = ko.numericObservable(stage_height);
-  this.dotRadius = ko.numericObservable(dot_radius);
-  this.maxPopulation.subscribe(this.changeHandler);
-  this.stageWidth.subscribe(this.changeHandler);
-  this.stageHeight.subscribe(this.changeHandler);
-  this.dotRadius.subscribe(this.changeHandler);
-};
-
-var options = new Options(MAX_POPULATION, STAGE_WIDTH, STAGE_HEIGHT, DOT_RADIUS)
+var options = new OptionController(250, 700, 500, 12);
 ko.applyBindings(options);
 
 // ++++++++++++++
@@ -49,7 +12,7 @@ ko.applyBindings(options);
 // ++++++++++++++
   
 var population = 0;
-var stage = Stage(options.stageWidth(), options.stageHeight());
+var stage = Scene(options.stageWidth(), options.stageHeight());
 var canvas = document.getElementById('canv-1');
 var ctx = canvas.getContext('2d');
 var dotId = 0;
@@ -221,7 +184,7 @@ function handleWallHit(currDot) {
 function reset() {
   population = 0;
   dotId = 0;
-  stage = Stage(options.stageWidth(), options.stageHeight());
+  stage = Scene(options.stageWidth(), options.stageHeight());
   canvas.width = stage.size.w;
   canvas.height = stage.size.h;
   quad = new QuadTree({x:0, y:0, width:stage.size.w, height:stage.size.h});
