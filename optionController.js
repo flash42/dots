@@ -26,10 +26,10 @@ var OptionController = function(max_population, stage_width, stage_height, dot_r
     optionController.stageWidth = ko.numericObservable(stage_width);
     optionController.stageHeight = ko.numericObservable(stage_height);
     optionController.dotRadius = ko.numericObservable(dot_radius);
-    optionController.maxPopulation.subscribe(this.changeHandler);
-    optionController.stageWidth.subscribe(this.changeHandler);
-    optionController.stageHeight.subscribe(this.changeHandler);
-    optionController.dotRadius.subscribe(this.changeHandler);
+    optionController.maxPopulation.subscribe(optionController.changeHandler);
+    optionController.stageWidth.subscribe(optionController.changeHandler);
+    optionController.stageHeight.subscribe(optionController.changeHandler);
+    optionController.dotRadius.subscribe(optionController.changeHandler);
 
     return optionController;
 };
