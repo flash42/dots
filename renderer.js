@@ -12,12 +12,12 @@ var Renderer = function() {
         ctx.restore();
     };
 
-    renderer.dotsDraw = function(scene, ctx) {
-        var currDot;
+    renderer.drawScene = function(scene, ctx) {
+        var entity;
         for (i = 0; i < scene.entities.length; i++) {
-            currDot = scene.entities[i];
+            entity = scene.entities[i];
             // if (scene.highlightID() == currDot.id) ctx.fillStyle = "green";
-            ctx.fillStyle = scene.dotColor;
+            ctx.fillStyle = entity.color;
             scene.entities[i].draw(ctx);
             ctx.fill();
         }
@@ -37,7 +37,7 @@ var Renderer = function() {
     renderer.render = function(scene, ctx) {
         renderer.clear(scene, ctx);
         renderer.fieldDraw(scene, ctx);
-        renderer.dotsDraw(scene, ctx);
+        renderer.drawScene(scene, ctx);
     };
 
     return renderer;

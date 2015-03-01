@@ -7,15 +7,15 @@ var Animator = function(options, quadTree) {
     var animator = {};
     animator.quadTree = quadTree;
     
-    animator.stepDot = function(entity, dir) {
-        if (dir === DIR_DOWN && entity.y < options.stageWidth() - options.
-            dotRadius()) {
+    animator.stepEntity = function(entity, dir) {
+        if (dir === DIR_DOWN && entity.y < options.stageWidth() - entity.
+            radius) {
             entity.move(entity.x, entity.y + entity.speed);
         }
         if (dir === DIR_RIGHT) {
             entity.move(entity.x + entity.speed, entity.y);
         }
-        if (dir === DIR_UP && options.dotRadius() + entity.speed < entity.y) {
+        if (dir === DIR_UP && entity.radius + entity.speed < entity.y) {
             entity.move(entity.x, entity.y - entity.speed);
         }
         if (dir === DIR_LEFT) {
@@ -101,12 +101,12 @@ var Animator = function(options, quadTree) {
         }
     };
 
-    animator.handleWallHit = function (currDot) {
-        if (currDot.aim === 1 && currDot.x <= 1) {
-            currDot.aim = options.stageWidth() - options.dotRadius();
+    animator.handleWallHit = function (entity) {
+        if (entity.aim === 1 && entity.x <= 1) {
+            entity.aim = options.stageWidth() - entity.radius;
         }
-        if (currDot.aim === (options.stageWidth() - options.dotRadius()) && (options.stageWidth() - options.dotRadius()) <= currDot.x) {
-            currDot.aim = 1;
+        if (entity.aim === (options.stageWidth() - entity.radius) && (options.stageWidth() - entity.radius) <= entity.x) {
+            entity.aim = 1;
         }
     };
 
@@ -117,7 +117,7 @@ var Animator = function(options, quadTree) {
         for (i = 0; i < scene.entities.length; i++) {
             currDot = scene.entities[i];
             toDir = animator.calcDir(currDot);
-            animator.stepDot(currDot, toDir);
+            animator.stepEntity(currDot, toDir);
             animator.handleWallHit(currDot);
         }
     };
