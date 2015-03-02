@@ -1,4 +1,3 @@
-
 var Debug = function(canvas, scene) {
     var debug = {};
     debug.scene = scene;

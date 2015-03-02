@@ -4,10 +4,10 @@ var QuadTreeSystem = function(quadTree) {
 
     quadTreeSystem.update = function(scene) {
         quadTreeSystem.quadTree.clear();
-        var currDot;
+        var entity;
         for (i = 0; i < scene.entities.length; i++) {
-            currDot = scene.entities[i];
-            quadTreeSystem.quadTree.insert(currDot);
+            entity = scene.entities[i];
+            quadTreeSystem.quadTree.insert(entity);
         }  
     }
 
