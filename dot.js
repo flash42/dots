@@ -28,6 +28,14 @@ var Dot = function(color, startX, startY, options, dotId) {
         ctx.arc(dot.x, dot.y, dot.radius / 2, 0, 2*Math.PI);
         ctx.closePath();
     };
+    
+    dot.drawIndicator = function(ctx) {
+        var indicatorLength = dot.radius;
+        ctx.beginPath();
+        ctx.moveTo(dot.x, dot.y);
+        ctx.lineTo(dot.x + dot.dir.x * indicatorLength, dot.y + dot.dir.y * indicatorLength);
+        ctx.closePath();
+    };
 
     return dot;
 };

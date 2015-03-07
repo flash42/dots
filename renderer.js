@@ -16,10 +16,13 @@ var Renderer = function() {
         var entity;
         for (i = 0; i < scene.entities.length; i++) {
             entity = scene.entities[i];
-            // if (scene.highlightID() == currDot.id) ctx.fillStyle = "green";
             ctx.fillStyle = entity.color;
             scene.entities[i].draw(ctx);
             ctx.fill();
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = "#1569C7";
+            scene.entities[i].drawIndicator(ctx);
+            ctx.stroke();
         }
     };
 
