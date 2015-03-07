@@ -6,15 +6,17 @@ var Director = function(quadTree, options) {
     
     director.spawn = function (scene) {
         if (options.maxPopulation() <= director.population) return;
+        
         if (Math.random() <= 0.3) {
-            director.population++;
             var startY = Math.round(Math.random() * 1000) * options.stageHeight() / 1000
             var newDot;
             newDot = Dot(scene.dotColor, 1, startY, options, director.entityId);
-            director.entityId++;
-            if (! director.checkIfEmpty(newDot)) return;
-            scene.entities.push(newDot);
 
+            if (! director.checkIfEmpty(newDot)) return;
+            
+            director.population++;
+            director.entityId++;
+            scene.entities.push(newDot);
             director.quadTree.insert(newDot);
         }
     }
