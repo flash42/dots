@@ -1,124 +1,35 @@
-var DIR_DOWN = 1;
-var DIR_RIGHT = 2;
-var DIR_UP = 3;
-var DIR_LEFT = 4;
-
 var Animator = function(options, quadTree) {
     var animator = {};
     animator.quadTree = quadTree;
     
-    animator.stepEntity = function(entity, dir) {
-        if (dir === DIR_DOWN && entity.y < options.stageWidth() - entity.
-            radius) {
-            entity.move(entity.x, entity.y + entity.speed);
-        }
-        if (dir === DIR_RIGHT) {
-            entity.move(entity.x + entity.speed, entity.y);
-        }
-        if (dir === DIR_UP && entity.radius + entity.speed < entity.y) {
-            entity.move(entity.x, entity.y - entity.speed);
-        }
-        if (dir === DIR_LEFT) {
-            entity.move(entity.x - entity.speed, entity.y);
-        }
+    animator.stepEntity = function(entity) {
+        entity.x += entity.dir.x;
+        entity.y += entity.dir.y; 
     };
+    
     animator.calcDir = function(entity) {
-        var chck;
-        var toDir = 0;
-
-        // TODO fix and use QuadTree - overlapping can happen
-        var candidateDots = animator.quadTree.retrieve(entity);
-        //var candidateDots = stage.blueDots.concat(stage.dots);
-        var canStep = true;
-        var deltaX = entity.x <= entity.aim ? entity.speed : -entity.speed;
-
-        var bestDot = {found: 0, color: entity.color};
-        for (j = 0; j < candidateDots.length; j++) {
-            chck = candidateDots[j];
-            if (bestDot.found < chck.found && entity.aim === chck.aim && entity.color === chck.color) bestDot = chck;
-            if (chck.intersects({id: entity.id, x: entity.x + deltaX, y: entity.y, width: entity.width, height: entity.height})) {
-                canStep = false;
-            }
+        if (animator.isHitWall(entity)) {
+            return {x: -entity.dir.x, y: -entity.dir.y};
         }
 
-        if (canStep) {
-            entity.found++;
-            entity.stalled = 0;
-            if (entity.x <= entity.aim) return DIR_RIGHT;
-            if (entity.aim <= entity.x) return DIR_LEFT;
-        } else {
-            if (0 < entity.found) entity.found = 0;
-            else entity.found--;
-            var deltaY = 0;
-            var dir;
-            deltaX = 0;
-            if (entity.found < -30 && 10 < bestDot.found) {
-                if (entity.y < bestDot.y) {
-                    deltaY = entity.speed;
-                    dir = DIR_DOWN;
-                }
-                else {
-                    deltaY = -entity.speed;
-                    dir = DIR_UP
-                }
-            }
-            else {
-                var randomDirSeed = Math.random();
-
-                if (randomDirSeed < 0.04) {
-                    if (entity.x <= entity.aim) {
-                        deltaX = -entity.speed;
-                        dir = DIR_LEFT;
-                    }
-                    else {
-                        deltaX = entity.speed;
-                        dir = DIR_RIGHT;
-                    }
-                }
-                else if (randomDirSeed < 0.50) {
-                    deltaY = entity.speed;
-                    dir = DIR_DOWN;
-                }
-                else {
-                    deltaY = -entity.speed;
-                    dir = DIR_UP
-                }
-            }
-            canStep = true;
-            for (j = 0; j < candidateDots.length; j++) {
-                chck = candidateDots[j];
-
-                if (chck.intersects({id: entity.id, x: entity.x + deltaX, y: entity.y + deltaY, width: entity.width, height: entity.height})) {
-                    canStep = false;
-                }
-            }
-            if (canStep) {
-                entity.stalled = 0;
-                return dir;
-            }
-            entity.stalled++;
-            return 0;
-        }
+        return entity.dir;
     };
 
-    animator.handleWallHit = function (entity) {
-        if (entity.aim === 1 && entity.x <= 1) {
-            entity.aim = options.stageWidth() - entity.radius;
-        }
-        if (entity.aim === (options.stageWidth() - entity.radius) && (options.stageWidth() - entity.radius) <= entity.x) {
-            entity.aim = 1;
-        }
+    animator.isHitWall = function (entity) {
+        return options.stageWidth() <= entity.x + entity.dir.x * entity.speed ||
+        options.stageHeight() <= entity.y + entity.dir.y * entity.speed || 
+        0 >= entity.x + entity.dir.x * entity.speed ||
+        0 >= entity.y + entity.dir.y * entity.speed   
     };
 
     animator.update = function (scene) {
-        var currDot;
+        var entity;
         var toDir;
 
         for (i = 0; i < scene.entities.length; i++) {
-            currDot = scene.entities[i];
-            toDir = animator.calcDir(currDot);
-            animator.stepEntity(currDot, toDir);
-            animator.handleWallHit(currDot);
+            entity = scene.entities[i];
+            entity.dir = animator.calcDir(entity);
+            animator.stepEntity(entity);
         }
     };
     

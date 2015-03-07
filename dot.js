@@ -1,15 +1,14 @@
 
 var Dot = function(color, startX, startY, options, dotId) {
     var dot = {};
-    var sgn = Math.round(Math.random() * 10) % 2 == 1 ? 1 : -1;
-    dot.speed = 1 + Math.round(Math.random() * 10) * 0.04 * sgn;
+    dot.speed = 1;
     dot.id = dotId;
     dot.radius = options.dotRadius();
     dot.x = startX;
-    dot.found = 0;
     dot.y = startY
     dot.color = color;
-    dot.aim = options.stageWidth() - options.dotRadius();
+    dot.aim = {x: 400, y: 400};
+    dot.dir = {x: 1, y: 0};
 
     dot.move = function(toX, toY) {
         dot.x = toX;
