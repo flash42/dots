@@ -8,7 +8,7 @@ var Application = function() {
         application.canvas.height = application.options.stageHeight(); 
 
         application.debug.setScene(application.scene);
-        application.quadTree = new QuadTree({x:0, y:0, width:application.options.stageWidth(), height:application.options.stageHeight()});
+        application.quadTree = new QuadTree({x:0, y:0, width:application.options.stageWidth(), height:application.options.stageHeight()}, 30, 100);
 
         application.director.setQuadTree(application.quadTree);
         application.director.reset()
@@ -31,7 +31,7 @@ var Application = function() {
     ko.applyBindings(application.options);
 
     application.scene = new Scene(application.options.stageWidth(), application.options.stageHeight());
-    application.quadTree = new QuadTree({x:0, y:0, width:application.options.stageWidth(), height:application.options.stageHeight()});
+    application.quadTree = new QuadTree({x:0, y:0, width:application.options.stageWidth(), height:application.options.stageHeight()}, 30, 100);
 
     application.canvas = document.getElementById('canv-1');
     application.renderer = new Renderer();
