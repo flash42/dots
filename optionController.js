@@ -1,6 +1,6 @@
 
 
-var OptionController = function(max_population, stage_width, stage_height, dot_radius, resetHandler) {
+var UIController = function(max_population, stage_width, stage_height, dot_radius, resetHandler, pauseHandler) {
     var optionController = {};
 
     ko.numericObservable = function(initialValue) {
@@ -24,6 +24,7 @@ var OptionController = function(max_population, stage_width, stage_height, dot_r
     }
     optionController.highlightID = ko.numericObservable(-1);
     optionController.population = ko.observable(0);
+    optionController.pause = pauseHandler;
     optionController.maxPopulation = ko.numericObservable(max_population);
     optionController.stageWidth = ko.numericObservable(stage_width);
     optionController.stageHeight = ko.numericObservable(stage_height);

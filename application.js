@@ -1,14 +1,21 @@
 var Application = function() {
     var application = {};
-
+    application.paused = false;
+   
+    application.pause = function() {
+        application.paused = !application.paused;
+        if (! application.paused)
+            window.requestAnimationFrame(application.update);
+    }
+    
     application.reset = function () {
         
-        application.scene = new Scene(application.options.stageWidth(), application.options.stageHeight());
-        application.canvas.width = application.options.stageWidth();
-        application.canvas.height = application.options.stageHeight(); 
+        application.scene = new Scene(application.uiController.stageWidth(), application.uiController.stageHeight());
+        application.canvas.width = application.uiController.stageWidth();
+        application.canvas.height = application.uiController.stageHeight(); 
 
         application.debug.setScene(application.scene);
-        application.quadTree = new QuadTree({x:0, y:0, width:application.options.stageWidth(), height:application.options.stageHeight()}, 15, 100);
+        application.quadTree = new QuadTree({x:0, y:0, width:application.uiController.stageWidth(), height:application.uiController.stageHeight()}, 15, 100);
 
         application.director.setQuadTree(application.quadTree);
         application.collisionSystem.setQuadTree(application.quadTree);
@@ -28,24 +35,27 @@ var Application = function() {
         application.animator.update(application.scene);
         application.quadTreeSystem.update(application.scene);
         application.renderer.render(application.scene, application.canvas.getContext('2d'));
-        application.options.population(application.director.population);
-        window.requestAnimationFrame(application.update);
+        
+        // Update UI
+        application.uiController.population(application.director.population);
+        if (! application.paused)
+            window.requestAnimationFrame(application.update);
     }
 
-    application.options = new OptionController(250, 700, 500, 12, application.reset);
-    ko.applyBindings(application.options);
+    application.uiController = new UIController(800, 700, 500, 9, application.reset, application.pause);
+    ko.applyBindings(application.uiController);
 
-    application.scene = new Scene(application.options.stageWidth(), application.options.stageHeight());
-    application.quadTree = new QuadTree({x:0, y:0, width:application.options.stageWidth(), height:application.options.stageHeight()}, 15, 100);
+    application.scene = new Scene(application.uiController.stageWidth(), application.uiController.stageHeight());
+    application.quadTree = new QuadTree({x:0, y:0, width:application.uiController.stageWidth(), height:application.uiController.stageHeight()}, 15, 100);
 
     application.canvas = document.getElementById('canv-1');
     application.renderer = new Renderer();
-    application.animator = new Animator(application.options, application.quadTree);
-    application.collisionSystem = new CollisionSystem(application.options, application.quadTree);
-    application.pathPlannerSystem = new PathPlannerSystem(application.options, application.quadTree);
+    application.animator = new Animator(application.uiController, application.quadTree);
+    application.collisionSystem = new CollisionSystem(application.uiController, application.quadTree);
+    application.pathPlannerSystem = new PathPlannerSystem(application.uiController, application.quadTree);
     application.debug = new Debug(application.canvas, application.scene);
     application.quadTreeSystem = new QuadTreeSystem(application.quadTree);
-    application.director = new Director(application.quadTree, application.options);
+    application.director = new Director(application.quadTree, application.uiController);
 
     application.run = function () {
         application.update();
