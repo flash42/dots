@@ -28,7 +28,7 @@ var Application = function() {
         application.animator.update(application.scene);
         application.quadTreeSystem.update(application.scene);
         application.renderer.render(application.scene, application.canvas.getContext('2d'));
-
+        application.options.population(application.director.population);
         window.requestAnimationFrame(application.update);
     }
 

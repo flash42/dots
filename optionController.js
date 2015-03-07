@@ -23,6 +23,7 @@ var OptionController = function(max_population, stage_width, stage_height, dot_r
         resetHandler();
     }
     optionController.highlightID = ko.numericObservable(-1);
+    optionController.population = ko.observable(0);
     optionController.maxPopulation = ko.numericObservable(max_population);
     optionController.stageWidth = ko.numericObservable(stage_width);
     optionController.stageHeight = ko.numericObservable(stage_height);
