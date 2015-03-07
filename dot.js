@@ -9,11 +9,8 @@ var Dot = function(color, startX, startY, options, dotId) {
     dot.color = color;
     dot.aim = {x: 400, y: 400};
     dot.dir = {x: 1, y: 0};
-
-    dot.move = function(toX, toY) {
-        dot.x = toX;
-        dot.y = toY;
-    };
+    dot.collision = false;
+    dot.wallHit = false;
 
     dot.contains = function(x, y) {
         return dot.x <= x && x <= dot.x + dot.radius && dot.y <= y && y <= dot.y + dot.radius

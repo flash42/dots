@@ -11,6 +11,8 @@ var Application = function() {
         application.quadTree = new QuadTree({x:0, y:0, width:application.options.stageWidth(), height:application.options.stageHeight()}, 30, 100);
 
         application.director.setQuadTree(application.quadTree);
+        application.collisionSystem.setQuadTree(application.quadTree);
+        application.pathPlannerSystem.setQuadTree(application.quadTree);
         application.director.reset()
 
         application.animator.setQuadTree(application.quadTree);
@@ -20,6 +22,9 @@ var Application = function() {
 
     application.update = function update() {
         application.director.update(application.scene);
+        application.collisionSystem.update(application.scene);
+        application.pathPlannerSystem.update(application.scene);
+
         application.animator.update(application.scene);
         application.quadTreeSystem.update(application.scene);
         application.renderer.render(application.scene, application.canvas.getContext('2d'));
@@ -36,6 +41,8 @@ var Application = function() {
     application.canvas = document.getElementById('canv-1');
     application.renderer = new Renderer();
     application.animator = new Animator(application.options, application.quadTree);
+    application.collisionSystem = new CollisionSystem(application.options, application.quadTree);
+    application.pathPlannerSystem = new PathPlannerSystem(application.options, application.quadTree);
     application.debug = new Debug(application.canvas, application.scene);
     application.quadTreeSystem = new QuadTreeSystem(application.quadTree);
     application.director = new Director(application.quadTree, application.options);
