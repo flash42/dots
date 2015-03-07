@@ -9,6 +9,7 @@ var Dot = function(color, startX, startY, options, dotId) {
     dot.x = startX;
     dot.y = startY
     dot.color = color;
+    dot.baseColor = color;
     dot.aim = {x: 400, y: 400};
     dot.dir = {x: 1, y: 0};
     dot.collision = false;
