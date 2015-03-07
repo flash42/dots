@@ -9,13 +9,13 @@ var CollisionSystem = function(options, quadTree) {
 
         for (i = 0; i < scene.entities.length; i++) {
             entity = scene.entities[i];
-            collisionSystem.checkCollision(entity);
+            collisionSystem.checkCollision(entity, scene);
         }
     };
     
-    collisionSystem.checkCollision = function(entity) {
+    collisionSystem.checkCollision = function(entity, scene) {
         entity.wallHit = collisionSystem.isHitWall(entity);
-        entity.collision = collisionSystem.isCollision(entity);
+        entity.collision = collisionSystem.isCollision(entity, scene);
     };
 
     collisionSystem.isHitWall = function (entity) {
@@ -25,7 +25,17 @@ var CollisionSystem = function(options, quadTree) {
         0 >= entity.y + entity.dir.y * entity.speed   
     };
     
-    collisionSystem.isCollision = function (entity) {
+    collisionSystem.isCollision = function (entityToCheck, scene) {
+        var entitiesInQuadrant = scene.entities; //collisionSystem.quadTree.retrieve(entityToCheck);
+        var candidateEntities = entitiesInQuadrant.filter(function(e) { return e.id != entityToCheck.id; });
+        
+        for (j = 0; j < candidateEntities.length; j++) {
+            currEntity = candidateEntities[j];
+
+            if (currEntity.intersects(entityToCheck)) {
+                return true;
+            }
+        }
         return false;   
     };
     

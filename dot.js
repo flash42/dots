@@ -4,6 +4,8 @@ var Dot = function(color, startX, startY, options, dotId) {
     dot.speed = 1;
     dot.id = dotId;
     dot.radius = options.dotRadius();
+    dot.width = options.dotRadius();
+    dot.height = options.dotRadius();
     dot.x = startX;
     dot.y = startY
     dot.color = color;
@@ -20,7 +22,7 @@ var Dot = function(color, startX, startY, options, dotId) {
         if (dot.id === otherDot.id) return false;  
 
         return Math.abs(dot.x - otherDot.x) < dot.radius 
-        && Math.abs(dot.y - otherDot.y) < dot.radius;
+            && Math.abs(dot.y - otherDot.y) < dot.radius;
     };
 
     dot.draw = function(ctx) {

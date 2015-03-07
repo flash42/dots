@@ -21,7 +21,7 @@ var PathPlannerSystem = function(options, quadTree) {
     }
     
     pathPlannerSystem.setQuadTree = function(quadTree) {
-        collisionSystem.quadTree = quadTree;
+        pathPlannerSystem.quadTree = quadTree;
     }
 
     return pathPlannerSystem;
