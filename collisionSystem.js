@@ -26,7 +26,7 @@ var CollisionSystem = function(options, quadTree) {
     };
     
     collisionSystem.isCollision = function (entityToCheck, scene) {
-        var entitiesInQuadrant = scene.entities; //collisionSystem.quadTree.retrieve(entityToCheck);
+        var entitiesInQuadrant = collisionSystem.quadTree.retrieve(entityToCheck);
         var candidateEntities = entitiesInQuadrant.filter(function(e) { return e.id != entityToCheck.id; });
         
         for (j = 0; j < candidateEntities.length; j++) {

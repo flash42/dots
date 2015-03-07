@@ -1,15 +1,23 @@
 var Application = function() {
     var application = {};
     application.paused = false;
-   
+
     application.pause = function() {
         application.paused = !application.paused;
         if (! application.paused)
             window.requestAnimationFrame(application.update);
     }
-    
+    var stats = new Stats();
+    stats.setMode(1); // 0: fps, 1: ms
+
+    // align top-left
+    stats.domElement.style.position = 'absolute';
+    stats.domElement.style.left = '0px';
+    stats.domElement.style.top = '0px';
+    window.document.body.appendChild(stats.domElement);
+
     application.reset = function () {
-        
+
         application.scene = new Scene(application.uiController.stageWidth(), application.uiController.stageHeight());
         application.canvas.width = application.uiController.stageWidth();
         application.canvas.height = application.uiController.stageHeight(); 
@@ -28,6 +36,8 @@ var Application = function() {
 
 
     application.update = function update() {
+        stats.begin();
+
         application.director.update(application.scene);
         application.collisionSystem.update(application.scene);
         application.pathPlannerSystem.update(application.scene);
@@ -35,9 +45,12 @@ var Application = function() {
         application.animator.update(application.scene);
         application.quadTreeSystem.update(application.scene);
         application.renderer.render(application.scene, application.canvas.getContext('2d'));
-        
+
         // Update UI
         application.uiController.population(application.director.population);
+        
+        stats.end();
+        
         if (! application.paused)
             window.requestAnimationFrame(application.update);
     }
