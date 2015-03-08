@@ -54,8 +54,14 @@ var Application = function() {
         if (! application.paused)
             window.requestAnimationFrame(application.update);
     }
-
-    application.uiController = new UIController(800, 700, 500, 9, application.reset, application.pause);
+    var stageHeight = 500;
+    var stageWidht = 700;
+    var dotRadius = 10;
+    var totalFillNumber = (stageHeight * stageWidht) / (dotRadius * dotRadius)
+    var fillPercentage = 0.18;
+    var maxPopulation = Math.round(totalFillNumber * fillPercentage);
+    
+    application.uiController = new UIController(maxPopulation, stageWidht, stageHeight, dotRadius, application.reset, application.pause);
     ko.applyBindings(application.uiController);
 
     application.scene = new Scene(application.uiController.stageWidth(), application.uiController.stageHeight());

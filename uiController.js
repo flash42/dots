@@ -25,15 +25,11 @@ var UIController = function(max_population, stage_width, stage_height, dot_radiu
     optionController.highlightID = ko.numericObservable(-1);
     optionController.population = ko.observable(0);
     optionController.pause = pauseHandler;
-    optionController.maxPopulation = ko.numericObservable(max_population);
-    optionController.stageWidth = ko.numericObservable(stage_width);
-    optionController.stageHeight = ko.numericObservable(stage_height);
-    optionController.dotRadius = ko.numericObservable(dot_radius);
-    optionController.maxPopulation.subscribe(optionController.changeHandler);
-    optionController.stageWidth.subscribe(optionController.changeHandler);
-    optionController.stageHeight.subscribe(optionController.changeHandler);
-    optionController.dotRadius.subscribe(optionController.changeHandler);
-
+    optionController.stageWidth = function () { return stage_width; };
+    optionController.stageHeight = function () { return stage_height; };
+    optionController.maxPopulation = function () { return max_population; };
+    optionController.dotRadius = function () { return dot_radius; };
+    
     return optionController;
 };
 
