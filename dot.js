@@ -12,8 +12,9 @@ var Dot = function(color, startX, startY, options, dotId) {
     dot.aim = {x: 400, y: 400};
     dot.collision = false;
     dot.wallHit = false;
-    
-    
+    dot.maxVel = 8;
+    dot.maxForce = 2;
+    dot.action = 0;
     // Weights
     dot.wArr = 1;
     dot.wDep = 1;
@@ -29,6 +30,7 @@ var Dot = function(color, startX, startY, options, dotId) {
     var random = function (min,max) {
         return Math.floor(Math.random()*(max-min+1)+min);
     }
+    
     dot.mass = options.dotRadius();
     dot.energy = 10 * random(5, 10);
     dot.pos = new Victor(startX, startY);

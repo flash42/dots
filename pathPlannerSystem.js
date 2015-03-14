@@ -9,15 +9,19 @@ var PathPlannerSystem = function(options, quadTree) {
 
         for (i = 0; i < scene.entities.length; i++) {
             entity = scene.entities[i];
-            entity.vel = pathPlannerSystem.calcVel(entity);
+            entity.acc = pathPlannerSystem.calcAccel(entity);
         }
     };
-    
-    pathPlannerSystem.calcVel = function (entity) { // TODO calc acceleration instead.
+    var zeroAcc = new Victor(0, 0);
+    pathPlannerSystem.calcAccel = function (entity) { // TODO calc acceleration instead.
         if (! entity.collision && !entity.wallHit) {
-             return entity.vel;
+             return zeroAcc;
         } 
-        return entity.vel.invert();
+        return entity.vel
+            .clone()
+            .invert()
+            .mulScalar(2, 2)
+            .limitMag(entity.maxForce);
     }
     
     pathPlannerSystem.setQuadTree = function(quadTree) {

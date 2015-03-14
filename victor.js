@@ -458,6 +458,16 @@ Victor.prototype.limit = function (max, factor) {
 	if (Math.abs(this.y) > max){ this.y *= factor; }
 	return this;
 };
+    
+Victor.prototype.limitMag = function (maxMag) {
+	if (maxMag < this.magnitude){
+        var ratio = maxMag / this.magnitude
+        this.x *= ratio;
+        this.y *= ratio;
+    }
+	
+	return this;
+};
 
 /**
  * Randomizes both vector axis with a value between 2 vectors
@@ -756,6 +766,12 @@ Victor.prototype.dot = function (vec2) {
 
 Victor.prototype.cross = function (vec2) {
 	return (this.x * vec2.y ) - (this.y * vec2.x );
+};
+    
+Victor.prototype.mulScalar = function (ratioX, ratioY) {
+	this.x *= ratioX;
+	this.y *= ratioY;
+    return this;
 };
 
 /**

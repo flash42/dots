@@ -56,10 +56,10 @@ var Application = function() {
     }
     var stageHeight = 500;
     var stageWidht = 700;
-    var dotRadius = 5;
+    var dotRadius = 20;
     var totalFillNumber = (stageHeight * stageWidht) / (dotRadius * dotRadius)
     var fillPercentage = 0.18;
-    var maxPopulation = Math.round(totalFillNumber * fillPercentage);
+    var maxPopulation = 1;Math.round(totalFillNumber * fillPercentage);
     
     application.uiController = new UIController(maxPopulation, stageWidht, stageHeight, dotRadius, application.reset, application.pause);
     ko.applyBindings(application.uiController);
