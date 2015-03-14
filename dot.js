@@ -26,15 +26,18 @@ var Dot = function(color, startX, startY, options, dotId) {
     dot.wCoh = 1;
     dot.wSep = 2;
     dot.wAli = 1;
+    
     // Physics 
     var random = function (min,max) {
-        return Math.floor(Math.random()*(max-min+1)+min);
+        var val = Math.floor(Math.random()*(max-min+1)+min);
+        if (val === 0) return 1;
+        return val;
     }
     
     dot.mass = options.dotRadius();
     dot.energy = 10 * random(5, 10);
     dot.pos = new Victor(startX, startY);
-    dot.vel = new Victor(random(0.5, 5), random(-5, 5));
+    dot.vel = new Victor(random(0, 5), random(-5, 5));
     dot.acc = new Victor();
     dot.wdelta = 0.0;
     dot.action = 0;
