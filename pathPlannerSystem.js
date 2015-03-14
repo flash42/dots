@@ -1,5 +1,3 @@
-var zeroV = new Victor(0, 0);
-
 var PathPlannerSystem = function(options, quadTree, manualControl) {
     var planner = {};
     planner.mc = manualControl;
@@ -12,17 +10,42 @@ var PathPlannerSystem = function(options, quadTree, manualControl) {
 
         for (i = 0; i < scene.entities.length; i++) {
             entity = scene.entities[i];
-            entity.acc = planner.calcAccel(entity);
+            entity.acc = planner.calcAccel(entity, scene);
         }
 
         planner.mc.reset()
     };
-    planner.calcAccel = function (entity) { // TODO calc acceleration instead.
-        return zeroV.clone()
+
+    planner.calcAccel = function (entity, scene) { 
+        var pathSteeringAcc = planner.pathSteering(entity, scene); 
+        if (pathSteeringAcc) {
+
+        }
+        else {
+            return Victor.zeroV()
                 .add(planner.mc.leftV)
                 .add(planner.mc.rightV)
                 .add(planner.mc.upV)
-                .add(planner.mc.downV).limitMag(entity.maxForce);
+                .add(planner.mc.downV).limitMag(entity.maxForce);    
+        }
+
+    }
+    var predLen = 25;
+    planner.pathSteering = function (entity, scene) {
+        var path = scene.path;
+        var moveVec = Victor.v(entity.vel).normalize().mulScalar(predLen);
+        var predictLoc = Victor.v(entity.pos).add(moveVec);
+        var a = Victor.v(predictLoc).subtract(path.start);
+        var b = Victor.v(path.end).subtract(path.start).normalize();
+        b.mulScalar(a.dot(b));
+        var normalPoint = Victor.v(path.start).add(b);
+        
+        var distance = predictLoc.distance(normalPoint);
+        if (distance > path.radius) {
+            var target = Victor.v(normalPoint).add(b.normalize().mulScalar(25));
+
+            return null; //seek(target);
+        }    
     }
 
     planner.setQuadTree = function(quadTree) {
@@ -51,12 +74,12 @@ var ManualControl = function() {
         mc.downV = downV;
     }
     mc.reset = function () {
-        mc.downV = zeroV;
-        mc.upV = zeroV;
-        mc.leftV = zeroV;
-        mc.rightV = zeroV;
+        mc.downV = Victor.zeroV();
+        mc.upV = Victor.zeroV();
+        mc.leftV = Victor.zeroV();
+        mc.rightV = Victor.zeroV();
     }
-    
+
     mc.reset();
 
     return mc;

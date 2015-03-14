@@ -112,6 +112,13 @@ Victor.fromArray = function (arr) {
 Victor.fromObject = function (obj) {
 	return new Victor(obj.x || 0, obj.y || 0);
 };
+    
+Victor.v = Victor.fromObject;
+Victor.zeroV = function () {
+	return new Victor(0, 0);
+};
+    
+    
 
 /**
  * # Manipulation
@@ -465,7 +472,7 @@ Victor.prototype.limitMag = function (maxMag) {
         this.x *= ratio;
         this.y *= ratio;
     }
-	
+
 	return this;
 };
 
@@ -770,7 +777,7 @@ Victor.prototype.cross = function (vec2) {
     
 Victor.prototype.mulScalar = function (ratioX, ratioY) {
 	this.x *= ratioX;
-	this.y *= ratioY;
+	this.y *= (ratioY ? ratioY : ratioX);
     return this;
 };
 

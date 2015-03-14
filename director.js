@@ -3,7 +3,7 @@ var Director = function(quadTree, options) {
     director.quadTree = quadTree;
     director.population = 0;
     director.entityId = 0;
-
+    
     director.spawn = function (scene) {
         if (options.maxPopulation() <= director.population) return;
 
@@ -54,10 +54,22 @@ var Director = function(quadTree, options) {
     }
 
     director.update = function(scene) {
+        if (! scene.path) scene.path = new Path(options, 100);
+
         director.retire(scene);  
         director.spawn(scene);  
     }
 
     return director;
 };
+
+var Path = function(options, radius) {
+    path = {};
+    path.radius = radius;
+    path.start = new Victor(0, options.stageHeight() / 2);
+
+    path.end = new Victor(options.stageWidth() + radius, options.stageHeight() / 2);
+    
+    return path;
+  }
 
