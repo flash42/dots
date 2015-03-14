@@ -9,15 +9,15 @@ var PathPlannerSystem = function(options, quadTree) {
 
         for (i = 0; i < scene.entities.length; i++) {
             entity = scene.entities[i];
-            entity.dir = pathPlannerSystem.calcDir(entity);
+            entity.vel = pathPlannerSystem.calcVel(entity);
         }
     };
     
-    pathPlannerSystem.calcDir = function (entity) {
+    pathPlannerSystem.calcVel = function (entity) { // TODO calc acceleration instead.
         if (! entity.collision && !entity.wallHit) {
-             return entity.dir;
+             return entity.vel;
         } 
-        return {x: -entity.dir.x, y: -entity.dir.y};
+        return entity.vel.invert();
     }
     
     pathPlannerSystem.setQuadTree = function(quadTree) {

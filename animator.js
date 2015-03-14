@@ -8,15 +8,12 @@ var Animator = function(options, quadTree) {
 
         for (i = 0; i < scene.entities.length; i++) {
             entity = scene.entities[i];
-            animator.stepEntity(entity);
+            entity.vel.add(entity.acc);
+            entity.pos.add(entity.vel);
             animator.setupStyle(entity);
         }
     };
-
-    animator.stepEntity = function(entity) {
-        entity.x += entity.dir.x;
-        entity.y += entity.dir.y; 
-    };    
+  
 
     animator.setupStyle = function(entity) {
         var currMillis = new Date().getTime();

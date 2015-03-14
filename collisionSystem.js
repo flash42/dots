@@ -19,10 +19,10 @@ var CollisionSystem = function(options, quadTree) {
     };
 
     collisionSystem.isHitWall = function (entity) {
-        return options.stageWidth() <= entity.x + entity.dir.x * entity.speed ||
-        options.stageHeight() <= entity.y + entity.dir.y * entity.speed || 
-        0 >= entity.x + entity.dir.x * entity.speed ||
-        0 >= entity.y + entity.dir.y * entity.speed   
+        return options.stageWidth() <= entity.pos.x + entity.vel.x * entity.speed ||
+        options.stageHeight() <= entity.pos.y + entity.vel.y * entity.speed || 
+        0 >= entity.pos.x + entity.vel.x * entity.speed ||
+        0 >= entity.pos.y + entity.vel.y * entity.speed   
     };
     
     collisionSystem.isCollision = function (entityToCheck, scene) {
