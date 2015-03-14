@@ -14,15 +14,15 @@ var CollisionSystem = function(options, quadTree) {
     };
     
     collisionSystem.checkCollision = function(entity, scene) {
-        entity.wallHit = collisionSystem.isHitWall(entity);
+        entity.out = collisionSystem.isOut(entity);
         entity.collision = collisionSystem.isCollision(entity, scene);
     };
 
-    collisionSystem.isHitWall = function (entity) {
-        return options.stageWidth() <= entity.pos.x + entity.vel.x * entity.speed ||
-        options.stageHeight() <= entity.pos.y + entity.vel.y * entity.speed || 
-        0 >= entity.pos.x + entity.vel.x * entity.speed ||
-        0 >= entity.pos.y + entity.vel.y * entity.speed   
+    collisionSystem.isOut = function (entity) {
+        return options.stageWidth() < (entity.pos.x - entity.radius) ||
+            (entity.pos.x + entity.radius) < 0 ||
+            options.stageHeight() < (entity.pos.y - entity.radius) ||
+            (entity.pos.y + entity.radius) < 0
     };
     
     collisionSystem.isCollision = function (entityToCheck, scene) {

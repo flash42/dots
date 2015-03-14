@@ -460,8 +460,8 @@ Victor.prototype.limit = function (max, factor) {
 };
     
 Victor.prototype.limitMag = function (maxMag) {
-	if (maxMag < this.magnitude){
-        var ratio = maxMag / this.magnitude
+	if (maxMag < this.magnitude()){
+        var ratio = maxMag / this.magnitude()
         this.x *= ratio;
         this.y *= ratio;
     }

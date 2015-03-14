@@ -1,7 +1,7 @@
 
 
-var UIController = function(max_population, stage_width, stage_height, dot_radius, resetHandler, pauseHandler) {
-    var optionController = {};
+var UIController = function(max_population, stage_width, stage_height, dot_radius, resetHandler, pauseHandler, keyboard) {
+    var ui = {};
 
     ko.numericObservable = function(initialValue) {
         var _actual = ko.observable(initialValue);
@@ -19,17 +19,40 @@ var UIController = function(max_population, stage_width, stage_height, dot_radiu
         return result;
     };
 
-    optionController.changeHandler = function(newValue) {
+    ui.changeHandler = function(newValue) {
         resetHandler();
     }
-    optionController.highlightID = ko.numericObservable(-1);
-    optionController.population = ko.observable(0);
-    optionController.pause = pauseHandler;
-    optionController.stageWidth = function () { return stage_width; };
-    optionController.stageHeight = function () { return stage_height; };
-    optionController.maxPopulation = function () { return max_population; };
-    optionController.dotRadius = function () { return dot_radius; };
-    
-    return optionController;
+    ui.highlightID = ko.numericObservable(-1);
+    ui.population = ko.observable(0);
+    ui.pause = pauseHandler;
+    ui.stageWidth = function () { return stage_width; };
+    ui.stageHeight = function () { return stage_height; };
+    ui.maxPopulation = function () { return max_population; };
+    ui.dotRadius = function () { return dot_radius; };
+
+    $(document).keydown(function(e) {
+        switch(e.which) {
+            case 37: // left
+                keyboard.left();
+                break;
+
+            case 38: // up
+                keyboard.up();
+                break;
+
+            case 39: // right
+                keyboard.right();
+                break;
+
+            case 40: // down
+                keyboard.down();
+                break;
+
+            default: return; // exit this handler for other keys
+        }
+        e.preventDefault(); // prevent the default action (scroll / move caret)
+    });
+
+    return ui;
 };
 

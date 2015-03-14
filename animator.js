@@ -19,7 +19,7 @@ var Animator = function(options, quadTree) {
 
     animator.setupStyle = function(entity) {
         var currMillis = new Date().getTime();
-        if (entity.collision || entity.wallHit) {
+        if (entity.collision || entity.out) {
             entity.color = "#A9D0F5";
             entity.colorAnimationStart = currMillis;
             return;

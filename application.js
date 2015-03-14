@@ -8,7 +8,7 @@ var Application = function() {
             window.requestAnimationFrame(application.update);
     }
     var stats = new Stats();
-    stats.setMode(1); // 0: fps, 1: ms
+    stats.setMode(0); // 0: fps, 1: ms
 
     // align top-left
     stats.domElement.style.position = 'absolute';
@@ -39,6 +39,9 @@ var Application = function() {
         stats.begin();
 
         application.director.update(application.scene);
+        // Update UI
+        application.uiController.population(application.director.population);
+        
         application.collisionSystem.update(application.scene);
         application.pathPlannerSystem.update(application.scene);
 
@@ -46,8 +49,7 @@ var Application = function() {
         application.quadTreeSystem.update(application.scene);
         application.renderer.render(application.scene, application.canvas.getContext('2d'));
 
-        // Update UI
-        application.uiController.population(application.director.population);
+        
         
         stats.end();
         
@@ -60,8 +62,8 @@ var Application = function() {
     var totalFillNumber = (stageHeight * stageWidht) / (dotRadius * dotRadius)
     var fillPercentage = 0.18;
     var maxPopulation = 1;Math.round(totalFillNumber * fillPercentage);
-    
-    application.uiController = new UIController(maxPopulation, stageWidht, stageHeight, dotRadius, application.reset, application.pause);
+    var mc = new ManualControl()
+    application.uiController = new UIController(maxPopulation, stageWidht, stageHeight, dotRadius, application.reset, application.pause, mc);
     ko.applyBindings(application.uiController);
 
     application.scene = new Scene(application.uiController.stageWidth(), application.uiController.stageHeight());
@@ -71,7 +73,7 @@ var Application = function() {
     application.renderer = new Renderer();
     application.animator = new Animator(application.uiController, application.quadTree);
     application.collisionSystem = new CollisionSystem(application.uiController, application.quadTree);
-    application.pathPlannerSystem = new PathPlannerSystem(application.uiController, application.quadTree);
+    application.pathPlannerSystem = new PathPlannerSystem(application.uiController, application.quadTree, mc);
     application.debug = new Debug(application.canvas, application.scene);
     application.quadTreeSystem = new QuadTreeSystem(application.quadTree);
     application.director = new Director(application.quadTree, application.uiController);
