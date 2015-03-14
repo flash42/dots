@@ -5,6 +5,7 @@ var Director = function(quadTree, options) {
     director.entityId = 0;
     
     director.spawn = function (scene) {
+        // TODO set path to entity itself.
         if (options.maxPopulation() <= director.population) return;
 
         if (Math.random() <= 0.3) {
