@@ -12,8 +12,8 @@ var Dot = function(color, startX, startY, options, dotId) {
     dot.aim = {x: 400, y: 400};
     dot.collision = false;
     dot.out = false;
-    dot.maxVel = 8;
-    dot.maxForce = 3;
+    dot.maxVel = 4;
+    dot.maxForce = 1.5;
     dot.action = 0;
     // Weights
     dot.wArr = 1;
@@ -26,6 +26,7 @@ var Dot = function(color, startX, startY, options, dotId) {
     dot.wCoh = 1;
     dot.wSep = 2;
     dot.wAli = 1;
+    // TODO Move out values to components and add them from director
     
     // Physics 
     var random = function (min,max) {

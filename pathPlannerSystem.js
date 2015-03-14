@@ -10,7 +10,7 @@ var PathPlannerSystem = function(options, quadTree, manualControl) {
 
         for (i = 0; i < scene.entities.length; i++) {
             entity = scene.entities[i];
-            entity.acc = planner.calcAccel(entity, scene);
+            entity.acc = planner.calcAccel(entity, scene).limitMag(entity.maxForce);
         }
 
         planner.mc.reset()
@@ -19,18 +19,18 @@ var PathPlannerSystem = function(options, quadTree, manualControl) {
     planner.calcAccel = function (entity, scene) { 
         var pathSteeringAcc = planner.pathSteering(entity, scene); 
         if (pathSteeringAcc) {
-
+            return pathSteeringAcc;
         }
         else {
             return Victor.zeroV()
                 .add(planner.mc.leftV)
                 .add(planner.mc.rightV)
                 .add(planner.mc.upV)
-                .add(planner.mc.downV).limitMag(entity.maxForce);    
+                .add(planner.mc.downV);    
         }
 
     }
-    var predLen = 25;
+    var predLen = 25; // TODO magic number
     planner.pathSteering = function (entity, scene) {
         var path = scene.path;
         var moveVec = Victor.v(entity.vel).normalize().mulScalar(predLen);
@@ -42,10 +42,17 @@ var PathPlannerSystem = function(options, quadTree, manualControl) {
         
         var distance = predictLoc.distance(normalPoint);
         if (distance > path.radius) {
-            var target = Victor.v(normalPoint).add(b.normalize().mulScalar(25));
+            var bNorm = Victor.v(b).normalize()
+            var target = Victor.v(normalPoint).add(bNorm.mulScalar(path.end.distance(b) / 3)); // TODO magic number 
 
-            return null; //seek(target);
+            return planner.seek(entity, target);
         }    
+    }
+    
+    planner.seek = function (entity, target) {
+        var desired = Victor.v(target).subtract(entity.pos);
+        desired.normalize().mulScalar(entity.maxVel);
+        return desired.subtract(entity.vel);
     }
 
     planner.setQuadTree = function(quadTree) {
