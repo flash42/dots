@@ -10,12 +10,16 @@ var SteeringSystem = function(options, quadTree, manualControl) {
 
         for (i = 0; i < scene.entities.length; i++) {
             entity = scene.entities[i];
+            
             var pathSteering = steering.pathFollow(entity, scene)
                 .mulScalar(1);
             var separationSteering = steering.separation(entity)
                 .mulScalar(1.5);
+            // TODO path cohesion -> should move towards groups ahead
             var cohesionSteering = steering.cohesion(entity)
-                .mulScalar(1);
+                .mulScalar(0.7);
+            // TODO align velocity with group ahead
+            // TODO try tagged steering
 
             var acc = Victor.zeroV()
                 .add(pathSteering)

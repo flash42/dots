@@ -9,13 +9,21 @@ var Director = function(quadTree, options) {
         return val;
     }
     director.spawn = function (scene) {
-        // TODO set path to entity itself.
         if (options.maxPopulation() <= director.population) return;
 
         if (Math.random() <= 0.3) {
-            var startY = options.stageHeight() / 2;
-            var startX = Math.random() <= 0.5 ? 1 : options.stageWidth() - 1;
-            var startPos = new Victor(startX, startY);
+            var orientation = Math.random() <= 0.66 ? "horizontal" : "vertical";
+            var startPos;
+            if (orientation === "horizontal") {
+                var startY = options.stageHeight() / 2;
+                var startX = Math.random() <= 0.5 ? 1 : options.stageWidth() - 1;
+                startPos = new Victor(startX, startY);    
+            } else {
+                var startY = 1;
+                var startX = random(options.stageWidth() * 0.3, options.stageWidth() * 0.7); 
+                startPos = new Victor(startX, startY);    
+            }
+
             var closestPath;
             for (var i = 0; i < scene.paths.length; i++) {
                 var currPath = scene.paths[i];
@@ -23,9 +31,12 @@ var Director = function(quadTree, options) {
                     closestPath = currPath;
                 }    
             }
-            var corrY =  closestPath.start.y < (options.stageHeight() / 2) ? random(0, options.stageHeight() * 0.6) : random(options.stageHeight() * 0.4, options.stageHeight());
+            if (orientation === "horizontal") {
+                var corrY = closestPath.start.y < (options.stageHeight() / 2) ? random(0, options.stageHeight() * 0.6) : random(options.stageHeight() * 0.4,       options.stageHeight());
+                startPos = new Victor(startPos.x, corrY)
+            }
 
-            newDot = Dot(scene.dotColor, Victor.v(closestPath.end).subtract(startPos), new Victor(startPos.x, corrY), options, director.entityId, closestPath);
+            newDot = Dot(scene.dotColor, Victor.v(closestPath.end).subtract(startPos), startPos, options, director.entityId, closestPath);
 
             if (! director.checkIfEmpty(newDot)) return;
 
@@ -73,6 +84,7 @@ var Director = function(quadTree, options) {
             scene.paths = [];
             scene.paths.push(new LeftToRightPath(options, 40, 100, 100));
             scene.paths.push(new RightToLeftPath(options, 40, 100, options.stageHeight() - 150));
+            scene.paths.push(new TopToBottomPath(options, 40, 100, options.stageWidth() / 2));
         }
         director.retire(scene);  
         director.spawn(scene);  
@@ -88,6 +100,15 @@ var LeftToRightPath = function(options, radius, distanceFromStage, yCoord) {
     path.radius = radius;
     path.start = new Victor(-distanceFromStage, yCoord);
     path.end = new Victor(options.stageWidth() + distanceFromStage, yCoord);
+
+    return path;
+}
+var TopToBottomPath = function(options, radius, distanceFromStage, xCoord) {
+    path = {};
+
+    path.radius = radius;
+    path.start = new Victor(xCoord, -distanceFromStage);
+    path.end = new Victor(xCoord, options.stageHeight() + distanceFromStage);
 
     return path;
 }
