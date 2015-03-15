@@ -1,37 +1,42 @@
-var PathPlannerSystem = function(options, quadTree, manualControl) {
-    var planner = {};
-    planner.mc = manualControl;
-    planner.quadTree = quadTree;
+var SteeringSystem = function(options, quadTree, manualControl) {
+    var steering = {};
+    steering.mc = manualControl;
+    steering.quadTree = quadTree;
 
 
-    planner.update = function (scene) {
+    steering.update = function (scene) {
         var entity;
         var toDir;
 
         for (i = 0; i < scene.entities.length; i++) {
             entity = scene.entities[i];
-            entity.acc = planner.calcAccel(entity, scene).limitMag(entity.maxForce);
+            var pathSteering = steering.pathSteering(entity, scene)
+            .mulScalar(1);
+            var separationSteering = steering.separationSteering(entity, steering.quadTree.retrieve(entity))
+            .mulScalar(1.5);
+
+            var acc = Victor.zeroV().add(pathSteering).add(separationSteering);
+            if (acc.isEqualTo(zeroV)) {
+                acc = steering.manualSteering(entity);
+            }
+            entity.acc = acc.limitMag(entity.maxForce);
         }
 
-        planner.mc.reset()
+        steering.mc.reset()
     };
 
-    planner.calcAccel = function (entity, scene) { 
-        var pathSteeringAcc = planner.pathSteering(entity, scene); 
-        if (pathSteeringAcc) {
-            return pathSteeringAcc;
-        }
-        else {
-            return Victor.zeroV()
-                .add(planner.mc.leftV)
-                .add(planner.mc.rightV)
-                .add(planner.mc.upV)
-                .add(planner.mc.downV);    
-        }
-
+    var zeroV = Victor.zeroV();
+    steering.manualSteering = function (entity) {
+        return Victor.zeroV()
+            .add(steering.mc.leftV)
+            .add(steering.mc.rightV)
+            .add(steering.mc.upV)
+            .add(steering.mc.downV);    
     }
-    var predLen = 25; // TODO magic number
-    planner.pathSteering = function (entity, scene) {
+
+    steering.pathSteering = function (entity, scene) {
+        var predLen = 25; // TODO magic number
+
         var path = scene.path;
         var moveVec = Victor.v(entity.vel).normalize().mulScalar(predLen);
         var predictLoc = Victor.v(entity.pos).add(moveVec);
@@ -39,27 +44,51 @@ var PathPlannerSystem = function(options, quadTree, manualControl) {
         var b = Victor.v(path.end).subtract(path.start).normalize();
         b.mulScalar(a.dot(b));
         var normalPoint = Victor.v(path.start).add(b);
-        
+
         var distance = predictLoc.distance(normalPoint);
         if (distance > path.radius) {
             var bNorm = Victor.v(b).normalize()
             var target = Victor.v(normalPoint).add(bNorm.mulScalar(path.end.distance(b) / 3)); // TODO magic number 
 
-            return planner.seek(entity, target);
-        }    
+            return steering.seek(entity, target);
+        } 
+        return zeroV;
     }
-    
-    planner.seek = function (entity, target) {
+
+    steering.seek = function (entity, target) {
         var desired = Victor.v(target).subtract(entity.pos);
         desired.normalize().mulScalar(entity.maxVel);
         return desired.subtract(entity.vel);
+    } 
+
+    steering.separationSteering = function (entity, nearbyEntities) {
+        var sepDistance = 20; // TODO magic number
+
+
+        var separate = new Victor();
+        var count = 0;
+        for (var i = 0; i < nearbyEntities.length; i++) {
+            var other = nearbyEntities[i];
+            var d = entity.pos.distance(other.pos);
+            if ((d > 0) && (d < sepDistance)) {
+                var diff = Victor.v(entity.pos).subtract(other.pos).normalize();
+                separate.add(diff);
+                count++;
+            }
+        }
+        if (count > 0) {
+            separate.mulScalar(1 / count);
+            separate.mulScalar(entity.maxVel);
+            return separate.subtract(entity.vel);
+        }
+        return zeroV;
     }
 
-    planner.setQuadTree = function(quadTree) {
-        planner.quadTree = quadTree;
+    steering.setQuadTree = function(quadTree) {
+        steering.quadTree = quadTree;
     }
 
-    return planner;
+    return steering;
 };
 
 var ManualControl = function() {

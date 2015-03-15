@@ -27,7 +27,7 @@ var Application = function() {
 
         application.director.setQuadTree(application.quadTree);
         application.collisionSystem.setQuadTree(application.quadTree);
-        application.pathPlannerSystem.setQuadTree(application.quadTree);
+        application.steeringSystem.setQuadTree(application.quadTree);
         application.director.reset()
 
         application.animator.setQuadTree(application.quadTree);
@@ -43,7 +43,7 @@ var Application = function() {
         application.uiController.population(application.director.population);
         
         application.collisionSystem.update(application.scene);
-        application.pathPlannerSystem.update(application.scene);
+        application.steeringSystem.update(application.scene);
 
         application.animator.update(application.scene);
         application.quadTreeSystem.update(application.scene);
@@ -74,7 +74,7 @@ var Application = function() {
     application.renderer = new Renderer();
     application.animator = new Animator(application.uiController, application.quadTree);
     application.collisionSystem = new CollisionSystem(application.uiController, application.quadTree);
-    application.pathPlannerSystem = new PathPlannerSystem(application.uiController, application.quadTree, mc);
+    application.steeringSystem = new SteeringSystem(application.uiController, application.quadTree, mc);
     application.debug = new Debug(application.canvas, application.scene);
     application.quadTreeSystem = new QuadTreeSystem(application.quadTree);
     application.director = new Director(application.quadTree, application.uiController);

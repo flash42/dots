@@ -12,20 +12,10 @@ var Dot = function(color, startX, startY, options, dotId) {
     dot.aim = {x: 400, y: 400};
     dot.collision = false;
     dot.out = false;
-    dot.maxVel = 4;
-    dot.maxForce = 1.5;
+    dot.maxVel = 2;
+    dot.maxForce = 0.7;
     dot.action = 0;
-    // Weights
-    dot.wArr = 1;
-    dot.wDep = 1;
-    dot.wPur = 1;
-    dot.wEva = 1;
-    dot.wWan = 1;
-    dot.wAvo = 5;
-    dot.wFlo = 1;
-    dot.wCoh = 1;
-    dot.wSep = 2;
-    dot.wAli = 1;
+
     // TODO Move out values to components and add them from director
     
     // Physics 
