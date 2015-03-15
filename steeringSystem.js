@@ -12,7 +12,8 @@ var SteeringSystem = function(options, quadTree, manualControl) {
             entity = scene.entities[i];
             var pathSteering = steering.pathSteering(entity, scene)
             .mulScalar(1);
-            var separationSteering = steering.separationSteering(entity, steering.quadTree.retrieve(entity))
+            
+            var separationSteering = steering.separationSteering(entity)
             .mulScalar(1.5);
 
             var acc = Victor.zeroV().add(pathSteering).add(separationSteering);
@@ -24,6 +25,11 @@ var SteeringSystem = function(options, quadTree, manualControl) {
 
         steering.mc.reset()
     };
+    
+    steering.getNearbyEntities = function (entity) {
+        var notMeFilter = function(e) { return e.id != entity.id; };
+        return steering.quadTree.retrieve(entity).filter(notMeFilter);
+    }
 
     var zeroV = Victor.zeroV();
     steering.manualSteering = function (entity) {
@@ -61,9 +67,9 @@ var SteeringSystem = function(options, quadTree, manualControl) {
         return desired.subtract(entity.vel);
     } 
 
-    steering.separationSteering = function (entity, nearbyEntities) {
-        var sepDistance = 20; // TODO magic number
-
+    steering.separationSteering = function (entity) {
+        var sepDistance = 25; // TODO magic number
+        var nearbyEntities = steering.getNearbyEntities(entity);
 
         var separate = new Victor();
         var count = 0;

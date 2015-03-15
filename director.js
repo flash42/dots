@@ -55,7 +55,7 @@ var Director = function(quadTree, options) {
     }
 
     director.update = function(scene) {
-        if (! scene.path) scene.path = new Path(options, 100);
+        if (! scene.path) scene.path = new Path(options, 80);
 
         director.retire(scene);  
         director.spawn(scene);  
@@ -67,7 +67,7 @@ var Director = function(quadTree, options) {
 var Path = function(options, radius) {
     path = {};
     path.radius = radius;
-    path.start = new Victor(0, options.stageHeight() / 2);
+    path.start = new Victor(-100, options.stageHeight() / 3);
 
     path.end = new Victor(options.stageWidth() + radius, options.stageHeight() / 2);
     

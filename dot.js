@@ -13,7 +13,7 @@ var Dot = function(color, startX, startY, options, dotId) {
     dot.collision = false;
     dot.out = false;
     dot.maxVel = 2;
-    dot.maxForce = 0.7;
+    dot.maxForce = 0.4;
     dot.action = 0;
 
     // TODO Move out values to components and add them from director
@@ -40,8 +40,8 @@ var Dot = function(color, startX, startY, options, dotId) {
     dot.intersects = function(otherDot) {
         if (dot.id === otherDot.id) return false;  
 
-        return Math.abs(dot.pos.x - otherDot.pos.x) < dot.radius 
-            && Math.abs(dot.pos.y - otherDot.pos.y) < dot.radius;
+        return Math.abs(dot.pos.x - otherDot.pos.x) < (dot.radius + otherDot.radius)  
+            && Math.abs(dot.pos.y - otherDot.pos.y) < (dot.radius + otherDot.radius);
     };
 
     dot.draw = function(ctx) {
