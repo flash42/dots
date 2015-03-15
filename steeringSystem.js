@@ -17,7 +17,7 @@ var SteeringSystem = function(options, quadTree, manualControl) {
                 .mulScalar(1.5);
             // TODO path cohesion -> should move towards groups ahead
             var cohesionSteering = steering.cohesion(entity)
-                .mulScalar(0.7);
+                .mulScalar(0);
             // TODO align velocity with group ahead
             // TODO try tagged steering
 
