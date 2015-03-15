@@ -1,5 +1,5 @@
 
-var Dot = function(color, startX, startY, options, dotId) {
+var Dot = function(color, startVel, startPos, options, dotId, path) {
     var dot = {};
     dot.speed = 1;
     dot.id = dotId;
@@ -12,9 +12,9 @@ var Dot = function(color, startX, startY, options, dotId) {
     dot.aim = {x: 400, y: 400};
     dot.collision = false;
     dot.out = false;
-    dot.maxVel = 2;
-    dot.maxForce = 0.4;
-    dot.action = 0;
+    dot.maxVel = 0.9;
+    dot.maxForce = 0.3;
+    dot.path = path;
 
     // TODO Move out values to components and add them from director
     
@@ -27,8 +27,8 @@ var Dot = function(color, startX, startY, options, dotId) {
     
     dot.mass = options.dotRadius();
     dot.energy = 10 * random(5, 10);
-    dot.pos = new Victor(startX, startY);
-    dot.vel = new Victor(random(0, 5), random(-5, 5));
+    dot.pos = Victor.v(startPos);
+    dot.vel = startVel;//new Victor(0, 0); // random(0, 5), random(-5, 5)
     dot.acc = new Victor();
 
     dot.intersects = function(otherDot) {

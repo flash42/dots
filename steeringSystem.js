@@ -40,9 +40,9 @@ var SteeringSystem = function(options, quadTree, manualControl) {
             .add(steering.mc.downV);    
     }
 
-    steering.pathSteering = function (entity, scene) {
-        var path = scene.path;
-        var magicRatio = 0.66; // TODO magic number - use radius of path and radius of entity
+    steering.pathSteering = function (entity) {
+        var path = entity.path;
+        var magicRatio = 0.5; // TODO magic number - use radius of path and radius of entity
         var predLen = entity.pos.distance(path.end) * magicRatio; 
         
 
