@@ -10,13 +10,18 @@ var SteeringSystem = function(options, quadTree, manualControl) {
 
         for (i = 0; i < scene.entities.length; i++) {
             entity = scene.entities[i];
-            var pathSteering = steering.pathSteering(entity, scene)
-            .mulScalar(1);
-            
-            var separationSteering = steering.separationSteering(entity)
-            .mulScalar(1.5);
+            var pathSteering = steering.pathFollow(entity, scene)
+                .mulScalar(1);
+            var separationSteering = steering.separation(entity)
+                .mulScalar(1.5);
+            var cohesionSteering = steering.cohesion(entity)
+                .mulScalar(1);
 
-            var acc = Victor.zeroV().add(pathSteering).add(separationSteering);
+            var acc = Victor.zeroV()
+                .add(pathSteering)
+                .add(separationSteering)
+                .add(cohesionSteering)
+            ;
             if (acc.isEqualTo(zeroV)) {
                 acc = steering.manualSteering(entity);
             }
@@ -40,7 +45,7 @@ var SteeringSystem = function(options, quadTree, manualControl) {
             .add(steering.mc.downV);    
     }
 
-    steering.pathSteering = function (entity) {
+    steering.pathFollow = function (entity) {
         var path = entity.path;
         var magicRatio = 0.5; // TODO magic number - use radius of path and radius of entity
         var predLen = entity.pos.distance(path.end) * magicRatio; 
@@ -69,7 +74,7 @@ var SteeringSystem = function(options, quadTree, manualControl) {
         return desired.subtract(entity.vel);
     } 
 
-    steering.separationSteering = function (entity) {
+    steering.separation = function (entity) {
         var sepDistance = entity.radius * 2; // TODO magic number
         var nearbyEntities = steering.getNearbyEntities(entity);
 
@@ -88,6 +93,28 @@ var SteeringSystem = function(options, quadTree, manualControl) {
             separate.mulScalar(1 / count);
             separate.mulScalar(entity.maxVel);
             return separate.subtract(entity.vel);
+
+//            return steering.seek(entity, separate.mulScalar(1 / count));
+        }
+        return zeroV;
+    }    
+    
+    steering.cohesion = function (entity) {
+        var cohDistance = entity.radius * 3; // TODO magic number
+        var nearbyEntities = steering.getNearbyEntities(entity);
+
+        var cohere = new Victor();
+        var count = 0;
+        for (var i = 0; i < nearbyEntities.length; i++) {
+            var other = nearbyEntities[i];
+            var d = entity.pos.distance(other.pos);
+            if (cohDistance < d) {
+                cohere.add(other.pos);
+                count++;
+            }
+        }
+        if (count > 0) {
+            steering.seek(entity, cohere.mulScalar(1 / count));
         }
         return zeroV;
     }
