@@ -41,9 +41,11 @@ var SteeringSystem = function(options, quadTree, manualControl) {
     }
 
     steering.pathSteering = function (entity, scene) {
-        var predLen = 25; // TODO magic number
-
         var path = scene.path;
+        var magicRatio = 0.66; // TODO magic number - use radius of path and radius of entity
+        var predLen = entity.pos.distance(path.end) * magicRatio; 
+        
+
         var moveVec = Victor.v(entity.vel).normalize().mulScalar(predLen);
         var predictLoc = Victor.v(entity.pos).add(moveVec);
         var a = Victor.v(predictLoc).subtract(path.start);
@@ -54,7 +56,7 @@ var SteeringSystem = function(options, quadTree, manualControl) {
         var distance = predictLoc.distance(normalPoint);
         if (distance > path.radius) {
             var bNorm = Victor.v(b).normalize()
-            var target = Victor.v(normalPoint).add(bNorm.mulScalar(path.end.distance(b) / 3)); // TODO magic number 
+            var target = Victor.v(normalPoint).add(bNorm.mulScalar(predLen)); // TODO magic number 
 
             return steering.seek(entity, target);
         } 
@@ -68,7 +70,7 @@ var SteeringSystem = function(options, quadTree, manualControl) {
     } 
 
     steering.separationSteering = function (entity) {
-        var sepDistance = 25; // TODO magic number
+        var sepDistance = entity.radius * 2; // TODO magic number
         var nearbyEntities = steering.getNearbyEntities(entity);
 
         var separate = new Victor();

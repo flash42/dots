@@ -24,7 +24,7 @@ var Animator = function(options, quadTree) {
             entity.colorAnimationStart = currMillis;
             return;
         }
-        if (entity.colorAnimationStart && entity.colorAnimationStart + 70 < currMillis) {
+        if (entity.colorAnimationStart && entity.colorAnimationStart + 40 < currMillis) {
             entity.colorAnimationStart = null;
             return;
         }

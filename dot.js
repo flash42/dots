@@ -30,18 +30,11 @@ var Dot = function(color, startX, startY, options, dotId) {
     dot.pos = new Victor(startX, startY);
     dot.vel = new Victor(random(0, 5), random(-5, 5));
     dot.acc = new Victor();
-    dot.wdelta = 0.0;
-    dot.action = 0;
-
-    dot.contains = function(x, y) {
-        return dot.pos.x <= x && x <= dot.pos.x + dot.radius && dot.pos.y <= y && y <= dot.pos.y + dot.radius
-    };
 
     dot.intersects = function(otherDot) {
         if (dot.id === otherDot.id) return false;  
 
-        return Math.abs(dot.pos.x - otherDot.pos.x) < (dot.radius + otherDot.radius)  
-            && Math.abs(dot.pos.y - otherDot.pos.y) < (dot.radius + otherDot.radius);
+        return dot.pos.distance(otherDot.pos) < (dot.radius + otherDot.radius);
     };
 
     dot.draw = function(ctx) {
@@ -57,8 +50,6 @@ var Dot = function(color, startX, startY, options, dotId) {
         ctx.lineTo(dot.pos.x + dot.vel.x * indicatorLength, dot.pos.y + dot.vel.y * indicatorLength);
         ctx.closePath();
     };
-    
-    
 
     return dot;
 };
