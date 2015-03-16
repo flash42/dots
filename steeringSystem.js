@@ -12,7 +12,7 @@ var SteeringSystem = function(options, quadTree, manualControl) {
             entity = scene.entities[i];
             
             var pathSteering = steering.pathFollow(entity, scene)
-                .mulScalar(1.1);
+                .mulScalar(1);
             var separationSteering = steering.separation(entity)
                 .mulScalar(1.5);
             // TODO path cohesion -> should move towards groups ahead

@@ -1,7 +1,6 @@
 
 var Dot = function(color, startVel, startPos, options, dotId, path) {
     var dot = {};
-    dot.speed = 1;
     dot.id = dotId;
     dot.radius = options.dotRadius();
     dot.width = options.dotRadius();

@@ -39,7 +39,14 @@ var Director = function(quadTree, options) {
                 startPos = new Victor(startPos.x, corrY)
             }
 
-            newDot = Dot(scene.dotColor, Victor.v(closestPath.end).subtract(startPos), startPos, options, director.entityId, closestPath);
+            var aColor = "#FF241E";
+//            var bColor = "#FF342F";
+            var cColor = "#FF110B";
+            var randColor = Math.random();
+            if (randColor < 0.5) entityColor = aColor;
+//            else if (randColor < 0.66) entityColor = bColor;
+            else entityColor = cColor;
+            newDot = Dot(entityColor, Victor.v(closestPath.end).subtract(startPos), startPos, options, director.entityId, closestPath);
 
             if (! director.checkIfEmpty(newDot)) return;
 

@@ -19,10 +19,10 @@ var Renderer = function() {
             ctx.fillStyle = entity.color;
             scene.entities[i].draw(ctx);
             ctx.fill();
-            ctx.lineWidth = 2;
-            ctx.strokeStyle = "#1569C7";
-            scene.entities[i].drawIndicator(ctx);
-            ctx.stroke();
+//            ctx.lineWidth = 2;
+//            ctx.strokeStyle = "#1569C7";
+//            scene.entities[i].drawIndicator(ctx);
+//            ctx.stroke();
         }
     };
 
