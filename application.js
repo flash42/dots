@@ -14,7 +14,7 @@ var Application = function() {
     stats.domElement.style.position = 'absolute';
     stats.domElement.style.left = '0px';
     stats.domElement.style.top = '0px';
-    window.document.body.appendChild(stats.domElement);
+    //window.document.body.appendChild(stats.domElement);
 
     application.reset = function () {
 

@@ -4,7 +4,7 @@ var Renderer = function() {
     renderer.fieldDraw = function(scene, ctx) {
         ctx.save();
         ctx.beginPath();
-        ctx.strokeStyle = "green";
+        ctx.strokeStyle = "white";
         ctx.lineWidth = "1";
         ctx.rect(0, 0, scene.size.w, scene.size.h);
         ctx.stroke();
