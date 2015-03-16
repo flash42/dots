@@ -62,7 +62,7 @@ var Application = function() {
     var dotDiam = dotRadius * 2;
     var totalFillNumber = (stageHeight * stageWidht) / (dotDiam * dotDiam)
     var fillPercentage = 0.18;
-    var maxPopulation = 400; // Math.round(totalFillNumber * fillPercentage);
+    var maxPopulation = 330; // Math.round(totalFillNumber * fillPercentage);
     
     var mc = new ManualControl()
     application.uiController = new UIController(maxPopulation, stageWidht, stageHeight, dotRadius, application.reset, application.pause, mc);

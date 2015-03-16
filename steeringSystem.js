@@ -12,7 +12,7 @@ var SteeringSystem = function(options, quadTree, manualControl) {
             entity = scene.entities[i];
             
             var pathSteering = steering.pathFollow(entity, scene)
-                .mulScalar(1);
+                .mulScalar(1.1);
             var separationSteering = steering.separation(entity)
                 .mulScalar(1.5);
             // TODO path cohesion -> should move towards groups ahead
@@ -61,13 +61,16 @@ var SteeringSystem = function(options, quadTree, manualControl) {
         var b = Victor.v(path.end).subtract(path.start).normalize();
         b.mulScalar(a.dot(b));
         var normalPoint = Victor.v(path.start).add(b);
+        
+        var toPathEnd = Victor.v(path.end).subtract(path.start).normalize();
+        var wrongDir = Victor.v(entity.vel).normalize().add(toPathEnd).length() < 1;
 
         var distance = predictLoc.distance(normalPoint);
-        if (distance > path.radius) {
+        if (true || distance > path.radius) {
             var bNorm = Victor.v(b).normalize()
-            var target = Victor.v(normalPoint).add(bNorm.mulScalar(predLen)); // TODO magic number 
+            //var target = Victor.v(normalPoint).add(bNorm.mulScalar(predLen)); // TODO magic number 
 
-            return steering.seek(entity, target);
+            return steering.seek(entity, path.end);
         } 
         return zeroV;
     }

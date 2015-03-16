@@ -11,28 +11,31 @@ var Director = function(quadTree, options) {
     director.spawn = function (scene) {
         if (options.maxPopulation() <= director.population) return;
 
-        if (Math.random() <= 0.3) {
+        if (Math.random() <= 0.35) {
             var orientation = Math.random() <= 0.66 ? "horizontal" : "vertical";
             var startPos;
             if (orientation === "horizontal") {
-                var startY = options.stageHeight() / 2;
                 var startX = Math.random() <= 0.5 ? 1 : options.stageWidth() - 1;
-                startPos = new Victor(startX, startY);    
+                startPos = new Victor(startX, 0);    
             } else {
                 var startY = 1;
-                var startX = random(options.stageWidth() * 0.3, options.stageWidth() * 0.7); 
+                var startX = random(0, options.stageWidth()); 
                 startPos = new Victor(startX, startY);    
             }
 
             var closestPath;
-            for (var i = 0; i < scene.paths.length; i++) {
-                var currPath = scene.paths[i];
-                if (! closestPath || currPath.start.distance(startPos) < closestPath.start.distance(startPos)) {
-                    closestPath = currPath;
-                }    
-            }
+            if (startPos.x === 1) closestPath = scene.paths[0];
+            else if (startPos.x === (options.stageWidth() - 1)) closestPath = scene.paths[1];
+            else closestPath = scene.paths[2];
+            
             if (orientation === "horizontal") {
-                var corrY = closestPath.start.y < (options.stageHeight() / 2) ? random(0, options.stageHeight() * 0.6) : random(options.stageHeight() * 0.4,       options.stageHeight());
+                var corrY;
+                if (startPos.x === 1) {
+                    corrY = random(0, options.stageHeight());
+                } else {
+                    corrY = random(options.stageHeight() * 0.4, options.stageHeight());
+                }
+                
                 startPos = new Victor(startPos.x, corrY)
             }
 
@@ -82,7 +85,7 @@ var Director = function(quadTree, options) {
     director.update = function(scene) {
         if (! scene.paths) { 
             scene.paths = [];
-            scene.paths.push(new LeftToRightPath(options, 40, 100, 100));
+            scene.paths.push(new LeftToRightPath(options, 40, options.stageHeight() / 2, options.stageHeight() / 2));
             scene.paths.push(new RightToLeftPath(options, 40, 100, options.stageHeight() - 150));
             scene.paths.push(new TopToBottomPath(options, 40, 100, options.stageWidth() / 2));
         }
@@ -98,8 +101,8 @@ var LeftToRightPath = function(options, radius, distanceFromStage, yCoord) {
     path = {};
 
     path.radius = radius;
-    path.start = new Victor(-distanceFromStage, yCoord);
-    path.end = new Victor(options.stageWidth() + distanceFromStage, yCoord);
+    path.start = new Victor(-100, yCoord);
+    path.end = new Victor(options.stageWidth() + 400, yCoord);
 
     return path;
 }
@@ -107,8 +110,8 @@ var TopToBottomPath = function(options, radius, distanceFromStage, xCoord) {
     path = {};
 
     path.radius = radius;
-    path.start = new Victor(xCoord, -distanceFromStage);
-    path.end = new Victor(xCoord, options.stageHeight() + distanceFromStage);
+    path.start = new Victor(xCoord, -150);
+    path.end = new Victor(xCoord, options.stageHeight() + 400);
 
     return path;
 }
@@ -117,8 +120,8 @@ var RightToLeftPath = function(options, radius, distanceFromStage, yCoord) {
     path = {};
 
     path.radius = radius;
-    path.end = new Victor(-distanceFromStage, yCoord);
-    path.start = new Victor(options.stageWidth() + distanceFromStage, yCoord);
+    path.end = new Victor(-200, -20);
+    path.start = new Victor(options.stageWidth() + distanceFromStage, options.stageHeight() * 0.7);
 
     return path;
 }

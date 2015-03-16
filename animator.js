@@ -16,10 +16,10 @@ var Animator = function(options, quadTree) {
             animator.setupStyle(entity);
         }
     };
-
+    var debug = false;
     animator.setupStyle = function(entity) {
         var currMillis = new Date().getTime();
-        if (entity.collision || entity.out) {
+        if (debug && (entity.collision || entity.out)) {
             entity.color = "#A9D0F5";
             entity.colorAnimationStart = currMillis;
             return;

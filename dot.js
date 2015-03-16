@@ -12,8 +12,8 @@ var Dot = function(color, startVel, startPos, options, dotId, path) {
     dot.aim = {x: 400, y: 400};
     dot.collision = false;
     dot.out = false;
-    dot.maxVel = 0.9;
-    dot.maxForce = 0.3;
+    dot.maxVel = 0.6;
+    dot.maxForce = 0.11;
     dot.path = path;
 
     // TODO Move out values to components and add them from director
